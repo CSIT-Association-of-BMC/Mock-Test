@@ -133,26 +133,6 @@ export default function ResultLoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-md mx-auto">
-        {/* Score Preview Card */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Test Completed! 🎉
-          </h2>
-          <p className="text-gray-600 mb-4">
-            You answered {pendingResult.score} out of{" "}
-            {pendingResult.totalQuestions} questions
-          </p>
-          <div className="text-5xl font-bold text-indigo-600">
-            {Math.round(
-              (pendingResult.score / pendingResult.totalQuestions) * 100
-            )}
-            %
-          </div>
-          <p className="mt-2 text-sm text-gray-600">
-            Login or register to save your detailed results
-          </p>
-        </div>
-
         {/* Auth Form */}
         <div className="bg-white rounded-xl shadow-lg p-8">
           <div className="flex mb-6">

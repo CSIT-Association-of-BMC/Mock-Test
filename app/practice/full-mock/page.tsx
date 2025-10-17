@@ -309,7 +309,7 @@ export default function FullMockTestPage() {
               {currentQ.subjectName}
             </span>
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-6 question-text">
             {currentQ.text}
           </h3>
           <div className="space-y-3">
@@ -341,25 +341,35 @@ export default function FullMockTestPage() {
           >
             Previous
           </Button>
+
+          {/* Show 5 questions at a time */}
           <div className="flex gap-2">
-            {Array.from({ length: testData.questions.length }).map(
-              (_, index) => (
+            {Array.from({
+              length: Math.min(
+                5,
+                testData.questions.length - Math.floor(currentQuestion / 5) * 5
+              ),
+            }).map((_, index) => {
+              const questionIndex = Math.floor(currentQuestion / 5) * 5 + index;
+              if (questionIndex >= testData.questions.length) return null;
+              return (
                 <button
-                  key={index}
-                  onClick={() => setCurrentQuestion(index)}
+                  key={questionIndex}
+                  onClick={() => setCurrentQuestion(questionIndex)}
                   className={`w-8 h-8 rounded text-xs font-medium ${
-                    index === currentQuestion
+                    questionIndex === currentQuestion
                       ? "bg-indigo-600 text-white"
-                      : answers[index] !== null
+                      : answers[questionIndex] !== null
                       ? "bg-green-100 text-green-800 border border-green-300"
                       : "bg-gray-100 text-gray-600 border border-gray-300"
                   }`}
                 >
-                  {index + 1}
+                  {questionIndex + 1}
                 </button>
-              )
-            )}
+              );
+            })}
           </div>
+
           {currentQuestion < testData.questions.length - 1 ? (
             <Button
               onClick={() => setCurrentQuestion((prev) => prev + 1)}
