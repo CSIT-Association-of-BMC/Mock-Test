@@ -100,7 +100,51 @@ export default function PracticePage() {
               </div>
 
               <Button
-                onClick={() => router.push("/practice/full-mock")}
+                onClick={async () => {
+                  // Fetch active sets
+                  try {
+                    const res = await fetch("/api/questions/sets");
+                    if (!res.ok) {
+                      alert("Failed to load question sets.");
+                      return;
+                    }
+                    const sets = await res.json();
+                    if (!sets || sets.length === 0) {
+                      alert("No active question sets available at the moment.");
+                      return;
+                    }
+
+                    if (sets.length === 1) {
+                      // Single set: go straight to test (server will pick up the set)
+                      router.push(`/practice/full-mock?setId=${sets[0].id}`);
+                      return;
+                    }
+
+                    // Multiple sets: ask user to pick one (quick prompt for now)
+                    const choices = sets
+                      .map(
+                        (s: any, i: number) =>
+                          `${i + 1}. ${s.setName} (${
+                            s._count?.questions || 0
+                          } Q)`
+                      )
+                      .join("\n");
+
+                    const input = prompt(
+                      `Multiple active sets found.\nChoose a set number:\n\n${choices}`
+                    );
+                    if (!input) return;
+                    const idx = parseInt(input, 10) - 1;
+                    if (isNaN(idx) || idx < 0 || idx >= sets.length) {
+                      alert("Invalid selection");
+                      return;
+                    }
+                    router.push(`/practice/full-mock?setId=${sets[idx].id}`);
+                  } catch (err) {
+                    console.error(err);
+                    alert("An error occurred while fetching sets.");
+                  }
+                }}
                 className="w-full py-3 sm:py-4 rounded-sm shadow-lg text-sm sm:text-md hover:shadow-xl transition-all duration-200 cursor-pointer"
               >
                 Start Full Mock Test

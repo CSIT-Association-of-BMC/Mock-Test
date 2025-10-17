@@ -11,27 +11,25 @@ type QuestionWithSubject = {
     };
 };
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        // Get the most recent active question set with questions
-        const questionSet = await prisma.questionSet.findFirst({
-            where: {
-                isActive: true,
-                questions: {
-                    some: {},
+        const url = new URL(request.url);
+        const setId = url.searchParams.get("setId");
+
+        // If setId is provided, try to fetch that set; otherwise pick most recent active set
+        const questionSet = setId
+            ? await prisma.questionSet.findUnique({
+                where: { id: setId },
+                include: { questions: { include: { subject: true } } },
+            })
+            : await prisma.questionSet.findFirst({
+                where: {
+                    isActive: true,
+                    questions: { some: {} },
                 },
-            },
-            include: {
-                questions: {
-                    include: {
-                        subject: true,
-                    },
-                },
-            },
-            orderBy: {
-                createdAt: "desc",
-            },
-        });
+                include: { questions: { include: { subject: true } } },
+                orderBy: { createdAt: "desc" },
+            });
 
         if (!questionSet) {
             return NextResponse.json(
