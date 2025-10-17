@@ -11,8 +11,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -30,7 +28,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { MenuIcon, ExternalLink, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
-import { title } from "process";
 
 const NavLinks = [
   {
@@ -39,12 +36,8 @@ const NavLinks = [
   },
 
   {
-    title: "About",
-    href: "/about",
-  },
-  {
     title: "Mock",
-    href: "/docs",
+    href: "/practice",
   },
   {
     title: "Subjects",
@@ -95,17 +88,14 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0 ">
             <Link href="/" className="flex items-center">
-              {/* <Image
+              <Image
                 src="https://res.cloudinary.com/dol8m5gx7/image/upload/v1723191383/logohero_nsqj8h.png"
                 alt="CSITABMC Logo"
                 priority={true}
                 height={40}
                 width={40}
                 className="rounded-lg shadow-sm"
-              /> */}
-              <span className="text-xl font-bold uppercase text-gray-800">
-                Mock Test
-              </span>
+              />
             </Link>
           </div>
 

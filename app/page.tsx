@@ -20,7 +20,7 @@ export default function Home() {
             B.Sc. CSIT Entrance Exam Preparation
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Master Your
+            Practise Your
             <span className="block text-blue-600">CSIT Entrance Exam</span>
           </h1>
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
