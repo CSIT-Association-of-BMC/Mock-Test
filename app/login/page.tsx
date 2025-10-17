@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, FileX, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
-export default function ResultLoginPage() {
+export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [formData, setFormData] = useState({
@@ -19,12 +20,10 @@ export default function ResultLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [pendingResult, setPendingResult] = useState<any>(null);
-  const [noResult, setNoResult] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
-    const checkAuthAndSaveResult = async () => {
+    const checkAuth = async () => {
       try {
         const response = await fetch("/api/auth/check", {
           method: "GET",
@@ -33,31 +32,19 @@ export default function ResultLoginPage() {
 
         if (response.ok) {
           const data = await response.json();
-          if (data.authenticated && data.user) {
-            // User is already logged in, save the pending result directly
-            const storedResult = localStorage.getItem("pendingTestResult");
-            if (storedResult) {
-              const pendingResult = JSON.parse(storedResult);
-              await saveResult(data.user.id);
-              return;
-            }
+          if (data.authenticated) {
+            // User is already logged in, redirect to dashboard
+            router.push("/dashboard");
+            return;
           }
         }
       } catch (err) {
         console.error("Auth check failed:", err);
       }
-
-      // Check if there's a pending test result (for non-authenticated users)
-      const storedResult = localStorage.getItem("pendingTestResult");
-      if (!storedResult) {
-        setNoResult(true);
-        return;
-      }
-      setPendingResult(JSON.parse(storedResult));
     };
 
-    checkAuthAndSaveResult();
-  }, []);
+    checkAuth();
+  }, [router]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -80,8 +67,7 @@ export default function ResultLoginPage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        await saveResult(data.user.id);
+        router.push("/dashboard");
       } else {
         setError("Invalid email or password");
       }
@@ -116,8 +102,7 @@ export default function ResultLoginPage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        await saveResult(data.user.id);
+        router.push("/dashboard");
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Registration failed");
@@ -129,73 +114,33 @@ export default function ResultLoginPage() {
     }
   };
 
-  const saveResult = async (userId: string) => {
-    try {
-      const response = await fetch("/api/results/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          ...pendingResult,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.removeItem("pendingTestResult");
-        router.push(`/result/view/${data.resultId}`);
-      } else {
-        setError("Failed to save result. Please try again.");
-      }
-    } catch (err) {
-      setError("An error occurred while saving your result.");
-    }
-  };
-
-  if (noResult) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full mx-4">
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-6">
-              <FileX className="w-8 h-8 text-red-600" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              No Test Result Found
-            </h1>
-            <p className="text-gray-600 mb-8">
-              You haven't taken any test yet. Please take a test first to view
-              your results.
-            </p>
-            <Button
-              onClick={() => router.push("/practice")}
-              className="w-full bg-primary hover:bg-primary/90 cursor-pointer"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Go to Practice
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!pendingResult) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-primary/10 py-12 px-4">
       <div className="max-w-md mx-auto">
+        {/* Back to Home */}
+        <div className="mb-8">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </Link>
+        </div>
+
         {/* Auth Form */}
         <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              {mode === "login" ? "Welcome Back" : "Create Account"}
+            </h1>
+            <p className="text-gray-600">
+              {mode === "login"
+                ? "Sign in to access your dashboard"
+                : "Join us to start your preparation journey"}
+            </p>
+          </div>
+
           <div className="flex mb-6">
             <button
               onClick={() => setMode("login")}
@@ -269,7 +214,7 @@ export default function ResultLoginPage() {
                 </div>
               </div>
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Logging in..." : "Login & View Results"}
+                {loading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
           ) : (
@@ -340,7 +285,7 @@ export default function ResultLoginPage() {
                     handleInputChange("priorityCollege", e.target.value)
                   }
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
-                  placeholder="e.g.  Butwal Multiple Campus"
+                  placeholder="e.g. Butwal Multiple Campus"
                 />
               </div>
               <div>
@@ -380,7 +325,7 @@ export default function ResultLoginPage() {
                 </div>
               )}
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Registering..." : "Register & View Results"}
+                {loading ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
           )}
