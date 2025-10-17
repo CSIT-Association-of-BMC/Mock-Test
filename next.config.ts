@@ -1,13 +1,21 @@
 import type { NextConfig } from "next";
+import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
-    domains: ['res.cloudinary.com']
+    domains: ["res.cloudinary.com"],
   },
   eslint: {
     ignoreDuringBuilds: true,
-  }
+  },
 };
 
-export default nextConfig;
+const pwaOptions = {
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === "development",
+};
+
+
+export default withPWA(pwaOptions as any)(nextConfig as any);

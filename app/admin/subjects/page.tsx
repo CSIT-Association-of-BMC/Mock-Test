@@ -3,14 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  BookOpen,
-  PlusCircle,
-  ArrowLeft,
-  FileText,
-  Users,
-  BarChart3,
-} from "lucide-react";
+import { BookOpen, ArrowLeft, FileText, BarChart3 } from "lucide-react";
 
 type Subject = {
   id: string;

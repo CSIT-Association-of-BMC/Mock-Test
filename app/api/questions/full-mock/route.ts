@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+type QuestionWithSubject = {
+    id: string;
+    text: string;
+    options: string[];
+    subjectId: string;
+    subject: {
+        name: string;
+    };
+};
+
 export async function GET() {
     try {
         // Get the most recent active question set with questions
@@ -39,7 +49,7 @@ export async function GET() {
         }
 
         // Remove correct answers from response (client shouldn't see them until submission)
-        const questionsForClient = questionSet.questions.map((q: any) => ({
+        const questionsForClient = questionSet.questions.map((q: QuestionWithSubject) => ({
             id: q.id,
             text: q.text,
             options: q.options,

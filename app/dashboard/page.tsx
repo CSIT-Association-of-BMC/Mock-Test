@@ -7,12 +7,25 @@ import {
   Trophy,
   Calendar,
   BookOpen,
-  User,
   LogOut,
   TrendingUp,
   Target,
   Award,
 } from "lucide-react";
+
+type UserResult = {
+  id: string;
+  score: number;
+  totalQuestions: number;
+  dateTaken: Date;
+  testType: string;
+  questionSet: {
+    setName: string;
+  } | null;
+  subject: {
+    name: string;
+  } | null;
+};
 
 export default async function DashboardPage() {
   const session = await getUserSession();
@@ -46,7 +59,8 @@ export default async function DashboardPage() {
     totalTests > 0
       ? Math.round(
           user.results.reduce(
-            (sum: number, r: any) => sum + (r.score / r.totalQuestions) * 100,
+            (sum: number, r: UserResult) =>
+              sum + (r.score / r.totalQuestions) * 100,
             0
           ) / totalTests
         )
@@ -55,7 +69,7 @@ export default async function DashboardPage() {
   const bestScore =
     totalTests > 0
       ? Math.max(
-          ...user.results.map((r: any) =>
+          ...user.results.map((r: UserResult) =>
             Math.round((r.score / r.totalQuestions) * 100)
           )
         )
@@ -151,7 +165,7 @@ export default async function DashboardPage() {
                 <p className="text-xl font-bold text-gray-900">
                   {
                     user.results.filter(
-                      (r: any) =>
+                      (r: UserResult) =>
                         new Date(r.dateTaken).getMonth() ===
                         new Date().getMonth()
                     ).length
@@ -192,7 +206,7 @@ export default async function DashboardPage() {
               </div>
             ) : (
               <div className="space-y-4 md:space-y-6">
-                {user.results.map((result: any) => {
+                {user.results.map((result: UserResult) => {
                   const percentage = Math.round(
                     (result.score / result.totalQuestions) * 100
                   );

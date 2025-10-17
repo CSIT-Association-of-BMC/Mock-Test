@@ -5,6 +5,7 @@ import ClientProviders from "@/components/client-providers";
 import Navbar from "@/components/custom/Navbar";
 import NextTopLoader from "nextjs-toploader";
 import Footer from "@/components/custom/Footer";
+import PWAInstallPrompt from "@/components/pwa-install-prompt";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -72,11 +73,31 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
+        <meta name="theme-color" content="#283D7A" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="CSIT MockTest" />
+        <link
+          rel="icon"
+          href="https://res.cloudinary.com/dol8m5gx7/image/upload/v1723191383/logohero_nsqj8h.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          href="https://res.cloudinary.com/dol8m5gx7/image/upload/v1723191383/logohero_nsqj8h.png"
+        />
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body className={`${poppins.className} antialiased`}>
         <NextTopLoader showSpinner={false} color="red" />
         <Navbar />
         <ClientProviders>{children}</ClientProviders>
         <Footer />
+        <PWAInstallPrompt />
       </body>
     </html>
   );

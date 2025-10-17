@@ -30,7 +30,7 @@ export default function CreateQuestionSetPage() {
         const errorData = await response.json();
         setError(errorData.error || "Failed to create question set");
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -105,8 +105,8 @@ export default function CreateQuestionSetPage() {
             <h3 className="font-medium text-blue-900 mb-2">Next Steps:</h3>
             <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
               <li>
-                After creating the set, you'll link questions from the question
-                bank
+                After creating the set, you&apos;ll link questions from the
+                question bank
               </li>
               <li>
                 Select questions from subjects (Physics, Chemistry, Math,

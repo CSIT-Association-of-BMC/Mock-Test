@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,11 +55,7 @@ export default function AdminSubjectPage() {
   const [correctAnswerIndex, setCorrectAnswerIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchSubjectAndQuestions();
-  }, [subjectId]);
-
-  const fetchSubjectAndQuestions = async () => {
+  const fetchSubjectAndQuestions = useCallback(async () => {
     try {
       // Fetch subject details
       const subjectResponse = await fetch(`/api/admin/subjects/${subjectId}`);
@@ -81,7 +77,11 @@ export default function AdminSubjectPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [subjectId]);
+
+  useEffect(() => {
+    fetchSubjectAndQuestions();
+  }, [fetchSubjectAndQuestions]);
 
   const resetForm = () => {
     setQuestionText("");

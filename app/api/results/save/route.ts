@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/session";
 
+type AnswerDetail = {
+    questionId: string;
+    selectedAnswer: number;
+};
+
+type ParsedAttemptDetails = {
+    answers: AnswerDetail[];
+};
+
 export async function POST(request: NextRequest) {
     try {
         const session = await getUserSession();
@@ -9,7 +18,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { userId, setId, score, totalQuestions, attemptDetails, testType, subjectId } = await request.json();
+        const { userId, setId, totalQuestions, attemptDetails, testType, subjectId } = await request.json();
 
         // Verify the session user matches the provided userId
         if (session.id !== userId) {
@@ -17,8 +26,8 @@ export async function POST(request: NextRequest) {
         }
 
         // Parse attempt details to calculate actual score
-        const parsedDetails = JSON.parse(attemptDetails);
-        const questionIds = parsedDetails.answers.map((a: any) => a.questionId);
+        const parsedDetails: ParsedAttemptDetails = JSON.parse(attemptDetails);
+        const questionIds = parsedDetails.answers.map((a: AnswerDetail) => a.questionId);
 
         // Fetch the correct answers
         const questions = await prisma.question.findMany({
@@ -33,8 +42,8 @@ export async function POST(request: NextRequest) {
 
         // Calculate real score
         let correctCount = 0;
-        parsedDetails.answers.forEach((answer: any, index: number) => {
-            const question = questions.find((q: any) => q.id === answer.questionId);
+        parsedDetails.answers.forEach((answer: AnswerDetail) => {
+            const question = questions.find((q) => q.id === answer.questionId);
             if (question && answer.selectedAnswer === question.correctAnswerIndex) {
                 correctCount++;
             }

@@ -84,7 +84,7 @@ export default function LoginPage() {
       } else {
         setError("Invalid email or password");
       }
-    } catch (err) {
+    } catch (_err) {
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -122,7 +122,7 @@ export default function LoginPage() {
         const errorData = await response.json();
         setError(errorData.error || "Registration failed");
       }
-    } catch (err) {
+    } catch (_err) {
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);

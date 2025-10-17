@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdminSession } from "@/lib/session";
 
+type QuestionInput = {
+    text: string;
+    options: string[];
+    correctAnswerIndex: number;
+    subjectId: string;
+};
+
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
@@ -67,7 +74,7 @@ export async function POST(
 
         // Create questions in bulk
         const createdQuestions = await prisma.question.createMany({
-            data: questions.map((q: any) => ({
+            data: questions.map((q: QuestionInput) => ({
                 text: q.text,
                 options: q.options,
                 correctAnswerIndex: q.correctAnswerIndex,

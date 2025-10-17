@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 
 type Subject = {
   id: string;
@@ -52,7 +52,11 @@ export default function AddQuestionsPage() {
     }
   };
 
-  const updateQuestion = (index: number, field: keyof Question, value: any) => {
+  const updateQuestion = (
+    index: number,
+    field: keyof Question,
+    value: string | string[] | number
+  ) => {
     const updatedQuestions = [...questions];
     updatedQuestions[index] = {
       ...updatedQuestions[index],
@@ -118,7 +122,7 @@ export default function AddQuestionsPage() {
         const errorData = await response.json();
         setError(errorData.error || "Failed to add questions");
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);

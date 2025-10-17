@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +8,6 @@ import {
   ArrowLeft,
   BookOpen,
   PlusCircle,
-  Edit,
   Trash2,
   CheckCircle,
   AlertTriangle,
@@ -43,11 +42,7 @@ export default function QuestionSetDetailsPage() {
   const params = useParams();
   const questionSetId = params.id as string;
 
-  useEffect(() => {
-    fetchQuestionSet();
-  }, [questionSetId]);
-
-  const fetchQuestionSet = async () => {
+  const fetchQuestionSet = useCallback(async () => {
     try {
       const response = await fetch(`/api/admin/question-sets/${questionSetId}`);
       if (response.ok) {
@@ -59,7 +54,11 @@ export default function QuestionSetDetailsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [questionSetId]);
+
+  useEffect(() => {
+    fetchQuestionSet();
+  }, [fetchQuestionSet]);
 
   const handleUnlinkQuestion = async (questionId: string) => {
     if (
