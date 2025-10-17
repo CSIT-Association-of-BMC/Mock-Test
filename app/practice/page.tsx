@@ -87,7 +87,7 @@ export default function PracticePage() {
                   <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
                   <div className="text-sm text-amber-800">
                     <strong>Important:</strong> Tab switching is restricted
-                    during the test. The exam will auto-submit if you switch
+                    during the test. The exam will auto submit if you switch
                     tabs or windows.
                   </div>
                 </div>
@@ -95,7 +95,7 @@ export default function PracticePage() {
 
               <Button
                 onClick={() => router.push("/practice/full-mock")}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                className="w-full bg-blue-600 hover:bg-blue-700  py-4 rounded-sm shadow-lg text-md hover:shadow-xl transition-all duration-200 cursor-pointer"
               >
                 Start Full Mock Test
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -129,13 +129,13 @@ export default function PracticePage() {
                   name: "Physics",
                   path: "physics",
                   color:
-                    "bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200",
+                    "bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 cursor-pointer",
                 },
                 {
                   name: "Chemistry",
                   path: "chemistry",
                   color:
-                    "bg-green-50 hover:bg-green-100 text-green-700 border-green-200",
+                    "bg-green-50 hover:bg-green-100 text-green-700 border-green-200 cursor-pointer",
                 },
                 {
                   name: "Mathematics",
@@ -147,13 +147,13 @@ export default function PracticePage() {
                   name: "English",
                   path: "english",
                   color:
-                    "bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200",
+                    "bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200 cursor-pointer",
                 },
                 {
                   name: "Computer Science",
                   path: "computer-science",
                   color:
-                    "bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200",
+                    "bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200 cursor-pointer",
                 },
               ].map((subject) => (
                 <Button
@@ -162,7 +162,7 @@ export default function PracticePage() {
                     router.push(`/practice/subject/${subject.path}`)
                   }
                   variant="outline"
-                  className={`w-full justify-between border-2 ${subject.color} hover:shadow-md transition-all duration-200 py-4 rounded-xl`}
+                  className={`w-full justify-between border-2 ${subject.color} hover:shadow-md transition-all duration-200 py-4 rounded-sm`}
                 >
                   <span className="font-medium">{subject.name}</span>
                   <ArrowRight className="w-4 h-4" />

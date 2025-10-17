@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, FileX, ArrowLeft } from "lucide-react";
 
 export default function ResultLoginPage() {
   const router = useRouter();
@@ -14,22 +14,23 @@ export default function ResultLoginPage() {
     name: "",
     priorityCollege: "",
     howHeard: "",
+    howHeardOther: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [pendingResult, setPendingResult] = useState<any>(null);
+  const [noResult, setNoResult] = useState(false);
 
   useEffect(() => {
     // Check if there's a pending test result
     const storedResult = localStorage.getItem("pendingTestResult");
     if (!storedResult) {
-      alert("No test result found. Please take a test first.");
-      router.push("/practice");
+      setNoResult(true);
       return;
     }
     setPendingResult(JSON.parse(storedResult));
-  }, [router]);
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -118,6 +119,34 @@ export default function ResultLoginPage() {
       setError("An error occurred while saving your result.");
     }
   };
+
+  if (noResult) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full mx-4">
+          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-6">
+              <FileX className="w-8 h-8 text-red-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              No Test Result Found
+            </h1>
+            <p className="text-gray-600 mb-8">
+              You haven't taken any test yet. Please take a test first to view
+              your results.
+            </p>
+            <Button
+              onClick={() => router.push("/practice")}
+              className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Go to Practice
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!pendingResult) {
     return (
@@ -283,7 +312,7 @@ export default function ResultLoginPage() {
                     handleInputChange("priorityCollege", e.target.value)
                   }
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  placeholder="e.g., TU, KU, PU"
+                  placeholder="e.g.  Butwal Multiple Campus"
                 />
               </div>
               <div>

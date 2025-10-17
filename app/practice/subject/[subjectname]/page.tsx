@@ -27,21 +27,21 @@ type Subject = {
 
 type TestResult = {
   questionId: string;
-  selectedAnswer: number;
-  isCorrect: boolean;
+  selectedAnswer: number | null;
   correctAnswer: number;
+  isCorrect: boolean;
 };
 
 export default function SubjectMockTestPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [subject, setSubject] = useState<Subject | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
+  const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [testCompleted, setTestCompleted] = useState(false);
+  const [processingResults, setProcessingResults] = useState(false);
 
   const params = useParams();
   const router = useRouter();
@@ -58,6 +58,7 @@ export default function SubjectMockTestPage() {
         const data = await response.json();
         setSubject(data.subject);
         setQuestions(data.questions);
+        setAnswers(new Array(data.questions.length).fill(null));
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Failed to load questions");
@@ -70,57 +71,69 @@ export default function SubjectMockTestPage() {
     }
   };
 
-  const handleAnswerSelect = (answerIndex: number) => {
-    if (showResult) return;
-    setSelectedAnswer(answerIndex);
-  };
-
-  const handleSubmitAnswer = async () => {
-    if (selectedAnswer === null || !questions[currentQuestionIndex]) return;
-
-    try {
-      const response = await fetch("/api/questions/check-answer", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          questionId: questions[currentQuestionIndex].id,
-          selectedAnswer,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const result: TestResult = {
-          questionId: questions[currentQuestionIndex].id,
-          selectedAnswer,
-          isCorrect: data.isCorrect,
-          correctAnswer: data.correctAnswer,
-        };
-
-        setTestResults((prev) => [...prev, result]);
-        setShowResult(true);
-      }
-    } catch (error) {
-      console.error("Error checking answer:", error);
-    }
+  const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
+    const newAnswers = [...answers];
+    newAnswers[questionIndex] = answerIndex;
+    setAnswers(newAnswers);
   };
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
-      setSelectedAnswer(null);
-      setShowResult(false);
     } else {
+      handleCompleteTest();
+    }
+  };
+
+  const handlePrevQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prev) => prev - 1);
+    }
+  };
+
+  const handleCompleteTest = async () => {
+    if (!questions.length) return;
+
+    setProcessingResults(true);
+
+    try {
+      // Get correct answers for all questions
+      const results: TestResult[] = [];
+      for (let i = 0; i < questions.length; i++) {
+        const response = await fetch("/api/questions/check-answer", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            questionId: questions[i].id,
+            selectedAnswer: answers[i],
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          results.push({
+            questionId: questions[i].id,
+            selectedAnswer: answers[i],
+            correctAnswer: data.correctAnswer,
+            isCorrect: answers[i] !== null ? data.isCorrect : false,
+          });
+        }
+      }
+
+      setTestResults(results);
       setTestCompleted(true);
+    } catch (error) {
+      console.error("Error completing test:", error);
+    } finally {
+      setProcessingResults(false);
     }
   };
 
   const handleRestart = () => {
     setCurrentQuestionIndex(0);
-    setSelectedAnswer(null);
-    setShowResult(false);
+    setAnswers(new Array(questions.length).fill(null));
     setTestResults([]);
     setTestCompleted(false);
   };
@@ -153,6 +166,19 @@ export default function SubjectMockTestPage() {
           <Button onClick={() => router.push("/practice")}>
             Back to Practice
           </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (processingResults) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-lg text-gray-600">
+            Processing, analyzing answers...
+          </p>
         </div>
       </div>
     );
@@ -204,6 +230,85 @@ export default function SubjectMockTestPage() {
             </Card>
           </div>
 
+          {/* Questions Review */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              Question Review
+            </h2>
+            <div className="space-y-4">
+              {questions.map((question, index) => {
+                const result = testResults[index];
+                return (
+                  <Card key={question.id} className="overflow-hidden">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                            result?.isCorrect
+                              ? "bg-green-100 text-green-800"
+                              : result?.selectedAnswer !== null
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-gray-900 mb-4 font-medium">
+                            {question.text}
+                          </p>
+                          <div className="space-y-2">
+                            {question.options.map((option, optionIndex) => {
+                              let optionClass =
+                                "flex items-center gap-3 p-3 rounded-lg border ";
+                              let icon = null;
+
+                              if (optionIndex === result?.correctAnswer) {
+                                optionClass +=
+                                  "border-green-200 bg-green-50 text-green-800";
+                                icon = (
+                                  <CheckCircle className="w-5 h-5 text-green-600" />
+                                );
+                              } else if (
+                                optionIndex === result?.selectedAnswer &&
+                                !result?.isCorrect
+                              ) {
+                                optionClass +=
+                                  "border-red-200 bg-red-50 text-red-800";
+                                icon = (
+                                  <XCircle className="w-5 h-5 text-red-600" />
+                                );
+                              } else {
+                                optionClass += "border-gray-200 text-gray-600";
+                              }
+
+                              return (
+                                <div key={optionIndex} className={optionClass}>
+                                  <div className="flex-shrink-0 w-6 h-6 rounded-full border flex items-center justify-center text-xs font-medium">
+                                    {String.fromCharCode(65 + optionIndex)}
+                                  </div>
+                                  <span className="flex-1">{option}</span>
+                                  {icon && (
+                                    <div className="flex-shrink-0">{icon}</div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                          {result?.selectedAnswer === null && (
+                            <div className="mt-3 text-sm text-orange-600 font-medium">
+                              ⚠️ Not answered
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="flex justify-center gap-4">
             <Button onClick={handleRestart} variant="outline">
               <RotateCcw className="w-4 h-4 mr-2" />
@@ -228,30 +333,34 @@ export default function SubjectMockTestPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <Button
-              onClick={() => router.push("/practice")}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Practice
-            </Button>
+          <div className="flex flex-col gap-2 w-full">
+            {/* Row: Back button (left) and Score (right) on same line */}
+            <div className="w-full flex items-center justify-between">
+              <div className="flex items-center">
+                <Button
+                  onClick={() => router.push("/practice")}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                  aria-label="Back to Practice"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="inline">Back to Practice</span>
+                </Button>
+              </div>
 
-            <div className="text-center">
-              <h1 className="text-xl font-bold text-gray-900">
-                {subject?.name} Mock Test
-              </h1>
-              <p className="text-sm text-gray-600">
-                Question {currentQuestionIndex + 1} of {questions.length}
-              </p>
+              <div className="text-center">
+                <p className="text-sm text-gray-600">Score</p>
+                <p className="text-lg font-bold text-blue-600">
+                  {getScore()}/{testResults.length || questions.length}
+                </p>
+              </div>
             </div>
 
-            <div className="text-right">
-              <p className="text-sm text-gray-600">Score</p>
-              <p className="text-lg font-bold text-blue-600">
-                {getScore()}/{testResults.length}
-              </p>
+            {/* Title row: centered on desktop */}
+            <div className="w-full">
+              <h1 className="mt-2 text-xl font-bold text-gray-900 truncate text-center sm:text-center">
+                {subject?.name} Mock Test
+              </h1>
             </div>
           </div>
         </div>
@@ -273,36 +382,17 @@ export default function SubjectMockTestPage() {
 
               <div className="space-y-3">
                 {currentQuestion?.options.map((option, index) => {
-                  let buttonClass =
-                    "w-full text-left p-4 border rounded-lg transition-all ";
-                  let icon = null;
-
-                  if (showResult && currentResult) {
-                    if (index === currentResult.correctAnswer) {
-                      buttonClass +=
-                        "border-green-200 bg-green-50 text-green-800";
-                      icon = <CheckCircle className="w-5 h-5 text-green-600" />;
-                    } else if (
-                      index === currentResult.selectedAnswer &&
-                      !currentResult.isCorrect
-                    ) {
-                      buttonClass += "border-red-200 bg-red-50 text-red-800";
-                      icon = <XCircle className="w-5 h-5 text-red-600" />;
-                    } else {
-                      buttonClass += "border-gray-200 opacity-50";
-                    }
-                  } else {
-                    buttonClass +=
-                      selectedAnswer === index
-                        ? "border-blue-200 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300";
-                  }
+                  const buttonClass =
+                    answers[currentQuestionIndex] === index
+                      ? "w-full text-left p-4 border-2 border-blue-500 bg-blue-50 rounded-lg transition-all"
+                      : "w-full text-left p-4 border border-gray-200 hover:border-gray-300 rounded-lg transition-all";
 
                   return (
                     <button
                       key={index}
-                      onClick={() => handleAnswerSelect(index)}
-                      disabled={showResult}
+                      onClick={() =>
+                        handleAnswerSelect(currentQuestionIndex, index)
+                      }
                       className={buttonClass}
                     >
                       <div className="flex items-center gap-3">
@@ -310,7 +400,6 @@ export default function SubjectMockTestPage() {
                           {String.fromCharCode(65 + index)}
                         </div>
                         <span className="flex-1">{option}</span>
-                        {icon && <div className="flex-shrink-0">{icon}</div>}
                       </div>
                     </button>
                   );
@@ -318,36 +407,30 @@ export default function SubjectMockTestPage() {
               </div>
             </div>
 
-            {!showResult ? (
-              <div className="flex justify-center">
+            <div className="flex justify-between items-center">
+              <Button
+                onClick={handlePrevQuestion}
+                disabled={currentQuestionIndex === 0}
+                variant="outline"
+              >
+                Previous
+              </Button>
+
+              <div className="text-sm text-gray-600 hidden sm:flex">
+                Question {currentQuestionIndex + 1} of {questions.length}
+              </div>
+
+              {currentQuestionIndex < questions.length - 1 ? (
+                <Button onClick={handleNextQuestion}>Next</Button>
+              ) : (
                 <Button
-                  onClick={handleSubmitAnswer}
-                  disabled={selectedAnswer === null}
-                  className="px-8"
+                  onClick={handleCompleteTest}
+                  className="bg-green-600 hover:bg-green-700"
                 >
-                  Submit Answer
+                  Complete Test
                 </Button>
-              </div>
-            ) : (
-              <div className="text-center">
-                <div className="mb-4">
-                  {currentResult?.isCorrect ? (
-                    <div className="text-green-600 font-medium">
-                      ✓ Correct Answer!
-                    </div>
-                  ) : (
-                    <div className="text-red-600 font-medium">
-                      ✗ Incorrect Answer
-                    </div>
-                  )}
-                </div>
-                <Button onClick={handleNextQuestion}>
-                  {currentQuestionIndex < questions.length - 1
-                    ? "Next Question"
-                    : "View Results"}
-                </Button>
-              </div>
-            )}
+              )}
+            </div>
           </CardContent>
         </Card>
 

@@ -24,21 +24,21 @@ export default function Home() {
             <span className="block text-blue-600">CSIT Entrance Exam</span>
           </h1>
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Comprehensive practice platform with full mock tests, subject-wise
-            practice, and detailed analytics. Take tests without login, register
-            only to save results.
+            A comprehensive online practice platform by{" "}
+            <strong>CSIT Association of BMC</strong>, featuring full mock tests,
+            subject wise practice designed to help learners evaluate and
+            improve.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/practice">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 h-auto shadow-lg hover:shadow-xl transition-all duration-200">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 h-auto shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer">
                 Start Practicing
-                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
             <Link href="/dashboard">
               <Button
                 variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 text-lg px-8 py-4 h-auto rounded-sm"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 text-lg px-8 py-4 h-auto rounded-sm cursor-pointer"
               >
                 View Dashboard
               </Button>
@@ -144,9 +144,8 @@ export default function Home() {
             B.Sc. CSIT entrance exam using our platform
           </p>
           <Link href="/practice">
-            <Button className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-4 h-auto rounded-sm shadow-lg hover:shadow-xl transition-all duration-200">
+            <Button className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-4 h-auto rounded-sm shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer">
               Get Started Now
-              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
         </div>

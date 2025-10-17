@@ -29,6 +29,7 @@ export default function FullMockTestPage() {
   const [testStarted, setTestStarted] = useState(false);
   const [tabSwitchWarning, setTabSwitchWarning] = useState(false);
   const [tabSwitchCount, setTabSwitchCount] = useState(0);
+  const [processingResults, setProcessingResults] = useState(false);
 
   // Fetch questions
   useEffect(() => {
@@ -123,33 +124,39 @@ export default function FullMockTestPage() {
   const submitTest = async () => {
     if (!testData) return;
 
-    // Calculate score (will be verified on server)
-    const score = answers.filter((answer) => answer !== null).length;
+    setProcessingResults(true);
 
-    // Prepare attempt details
-    const attemptDetails = {
-      questionSetId: testData.setId,
-      answers: answers.map((answer, index) => ({
-        questionId: testData.questions[index].id,
-        selectedAnswer: answer,
-        subjectId: testData.questions[index].subjectId,
-      })),
-    };
+    try {
+      // Calculate score (will be verified on server)
+      const score = answers.filter((answer) => answer !== null).length;
 
-    // Store in localStorage
-    const resultData = {
-      setId: testData.setId,
-      score: score,
-      totalQuestions: testData.questions.length,
-      attemptDetails: JSON.stringify(attemptDetails),
-      testType: "full_mock",
-      timestamp: new Date().toISOString(),
-    };
+      // Prepare attempt details
+      const attemptDetails = {
+        questionSetId: testData.setId,
+        answers: answers.map((answer, index) => ({
+          questionId: testData.questions[index].id,
+          selectedAnswer: answer,
+          subjectId: testData.questions[index].subjectId,
+        })),
+      };
 
-    localStorage.setItem("pendingTestResult", JSON.stringify(resultData));
+      // Store in localStorage
+      const resultData = {
+        setId: testData.setId,
+        score: score,
+        totalQuestions: testData.questions.length,
+        attemptDetails: JSON.stringify(attemptDetails),
+        testType: "full_mock",
+        timestamp: new Date().toISOString(),
+      };
 
-    // Redirect to result login page
-    router.push("/result/login");
+      localStorage.setItem("pendingTestResult", JSON.stringify(resultData));
+
+      // Redirect to result login page
+      router.push("/result/login");
+    } finally {
+      setProcessingResults(false);
+    }
   };
 
   const handleStartTest = () => {
@@ -181,6 +188,19 @@ export default function FullMockTestPage() {
           <Button onClick={() => router.push("/practice")} className="mt-4">
             Go Back
           </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (processingResults) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+          <p className="text-lg text-gray-600">
+            Processing, analyzing answers...
+          </p>
         </div>
       </div>
     );
@@ -256,33 +276,35 @@ export default function FullMockTestPage() {
       {tabSwitchWarning && (
         <div className="fixed top-0 left-0 right-0 bg-red-600 text-white py-3 px-4 z-50 text-center font-semibold">
           ⚠️ Warning: Tab switching detected! ({tabSwitchCount}/3) - Test will
-          auto-submit after 3 warnings.
+          auto submit after 3 warnings.
         </div>
       )}
 
       {/* Header */}
       <div className="bg-white shadow-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <div className="text-center md:text-left">
+              <h2 className="text-lg md:text-xl font-bold text-gray-900">
                 {testData.setName}
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs md:text-sm text-gray-600">
                 Question {currentQuestion + 1} of {testData.questions.length}
               </p>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="text-right">
-                <p className="text-sm text-gray-600">Answered</p>
-                <p className="text-lg font-bold text-gray-900">
+            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
+              <div className="text-center md:text-right">
+                <p className="text-xs md:text-sm text-gray-600">Answered</p>
+                <p className="text-base md:text-lg font-bold text-gray-900">
                   {answeredCount}/{testData.questions.length}
                 </p>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-600">Time Remaining</p>
+              <div className="text-center md:text-right">
+                <p className="text-xs md:text-sm text-gray-600">
+                  Time Remaining
+                </p>
                 <p
-                  className={`text-lg font-bold ${
+                  className={`text-base md:text-lg font-bold ${
                     timeRemaining < 600 ? "text-red-600" : "text-gray-900"
                   }`}
                 >
