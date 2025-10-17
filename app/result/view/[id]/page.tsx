@@ -1,0 +1,260 @@
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { getUserSession } from "@/lib/session";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Trophy, TrendingUp, Calendar, BookOpen } from "lucide-react";
+
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function ResultViewPage({ params }: PageProps) {
+  const session = await getUserSession();
+  if (!session) {
+    redirect("/result/login");
+  }
+
+  const { id } = await params;
+
+  const result = await prisma.userResult.findUnique({
+    where: { id },
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+      questionSet: {
+        select: {
+          setName: true,
+        },
+      },
+      subject: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
+  if (!result) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Result Not Found
+          </h1>
+          <Link href="/practice">
+            <Button>Back to Practice</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Verify user owns this result
+  if (result.userId !== session.id) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Unauthorized
+          </h1>
+          <p className="text-gray-600 mb-4">
+            You don't have permission to view this result.
+          </p>
+          <Link href="/practice">
+            <Button>Back to Practice</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const percentage = Math.round((result.score / result.totalQuestions) * 100);
+  const attemptData = JSON.parse(result.attemptDetails);
+
+  // Calculate subject-wise breakdown for full mock tests
+  const subjectBreakdown: { [key: string]: { correct: number; total: number } } =
+    {};
+
+  if (result.testType === "full_mock" && attemptData.answers) {
+    // Fetch questions with subjects
+    const questionIds = attemptData.answers.map((a: any) => a.questionId);
+    const questions = await prisma.question.findMany({
+      where: { id: { in: questionIds } },
+      include: { subject: true },
+    });
+
+    attemptData.answers.forEach((answer: any) => {
+      const question = questions.find((q: any) => q.id === answer.questionId);
+      if (question) {
+        const subjectName = question.subject.name;
+        if (!subjectBreakdown[subjectName]) {
+          subjectBreakdown[subjectName] = { correct: 0, total: 0 };
+        }
+        subjectBreakdown[subjectName].total++;
+        if (answer.selectedAnswer === question.correctAnswerIndex) {
+          subjectBreakdown[subjectName].correct++;
+        }
+      }
+    });
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Test Results
+          </h1>
+          <p className="text-gray-600">
+            {result.questionSet?.setName ||
+              result.subject?.name ||
+              "Test Result"}
+          </p>
+        </div>
+
+        {/* Score Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 text-center">
+          <div className="flex justify-center mb-4">
+            <Trophy className="w-16 h-16 text-yellow-500" />
+          </div>
+          <h2 className="text-5xl font-bold text-indigo-600 mb-2">
+            {percentage}%
+          </h2>
+          <p className="text-xl text-gray-600 mb-4">
+            {result.score} out of {result.totalQuestions} correct
+          </p>
+          <div className="flex justify-center gap-6 text-sm text-gray-600">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              {new Date(result.dateTaken).toLocaleDateString()}
+            </div>
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              {result.testType === "full_mock"
+                ? "Full Mock Test"
+                : "Subject-Wise Practice"}
+            </div>
+          </div>
+        </div>
+
+        {/* Performance Analysis */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <TrendingUp className="w-6 h-6 text-green-600" />
+              <h3 className="text-xl font-semibold text-gray-900">
+                Performance
+              </h3>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm text-gray-600">Accuracy</span>
+                  <span className="text-sm font-semibold">{percentage}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-green-500 h-2 rounded-full"
+                    style={{ width: `${percentage}%` }}
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm text-gray-600">
+                    Questions Attempted
+                  </span>
+                  <span className="text-sm font-semibold">
+                    {result.totalQuestions}/{result.totalQuestions}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-blue-500 h-2 rounded-full w-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              Statistics
+            </h3>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Correct Answers</span>
+                <span className="font-semibold text-green-600">
+                  {result.score}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Wrong Answers</span>
+                <span className="font-semibold text-red-600">
+                  {result.totalQuestions - result.score}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Total Questions</span>
+                <span className="font-semibold text-gray-900">
+                  {result.totalQuestions}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Subject-Wise Breakdown (for full mock tests) */}
+        {result.testType === "full_mock" &&
+          Object.keys(subjectBreakdown).length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Subject-Wise Performance
+              </h3>
+              <div className="space-y-4">
+                {Object.entries(subjectBreakdown).map(([subject, data]) => {
+                  const subjectPercentage = Math.round(
+                    (data.correct / data.total) * 100
+                  );
+                  return (
+                    <div key={subject}>
+                      <div className="flex justify-between mb-2">
+                        <span className="font-medium text-gray-700">
+                          {subject}
+                        </span>
+                        <span className="text-sm text-gray-600">
+                          {data.correct}/{data.total} ({subjectPercentage}%)
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-indigo-600 h-2 rounded-full transition-all"
+                          style={{ width: `${subjectPercentage}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+        {/* Actions */}
+        <div className="flex gap-4 justify-center">
+          <Link href="/practice">
+            <Button className="bg-indigo-600 hover:bg-indigo-700">
+              Take Another Test
+            </Button>
+          </Link>
+          <Link href="/dashboard">
+            <Button variant="outline">View All Results</Button>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}

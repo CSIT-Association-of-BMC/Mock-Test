@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Subject {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  questions Question[]
+  results   UserResult[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("subjects")
+}
+
+model QuestionSet {
+  id        String     @id @default(cuid())
+  setName   String     @unique
+  questions Question[]
+  results   UserResult[]
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("question_sets")
+}
+
+model Question {
+  id                 String       @id @default(cuid())
+  text               String       @db.Text
+  options            String[]
+  correctAnswerIndex Int
+  subjectId          String
+  questionSetId      String?
+  subject            Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  questionSet        QuestionSet? @relation(fields: [questionSetId], references: [id], onDelete: SetNull)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  @@index([subjectId])
+  @@index([questionSetId])
+  @@map("questions")
+}
+
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  name           String
+  password       String
+  priorityCollege String?
+  howHeard       String?
+  results        UserResult[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("users")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model UserResult {
+  id             String       @id @default(cuid())
+  userId         String
+  questionSetId  String?
+  subjectId      String?
+  score          Int
+  totalQuestions Int
+  dateTaken      DateTime     @default(now())
+  attemptDetails String       @db.Text // JSON string containing question-by-question responses
+  testType       String       // "full_mock" or "subject_wise"
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionSet    QuestionSet? @relation(fields: [questionSetId], references: [id], onDelete: SetNull)
+  subject        Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([questionSetId])
+  @@index([subjectId])
+  @@map("user_results")
+}
