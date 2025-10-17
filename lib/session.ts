@@ -14,7 +14,7 @@ export async function getAdminSession() {
     try {
         const verified = await jwtVerify(token.value, secret);
         return verified.payload as { id: string; email: string; role: string };
-    } catch (error) {
+    } catch (_error) {
         return null;
     }
 }
@@ -30,7 +30,7 @@ export async function getUserSession() {
     try {
         const verified = await jwtVerify(token.value, secret);
         return verified.payload as { id: string; email: string; role: string };
-    } catch (error) {
+    } catch (_error) {
         return null;
     }
 }
