@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://mock.csitabmc.com"),
   title: "Mock Test - CSIT Association Of BMC",
   description:
-    "CSIT Association of Butwal Multiple Campus is Non profit, Non political association of CSIT Students of Butwal Multiple Campus.",
+    "Prepare for your CSIT exams with our comprehensive mock test platform. Access a variety of question sets, track your performance, and enhance your knowledge effectively.",
   openGraph: {
     images: {
       url: "https://res.cloudinary.com/dol8m5gx7/image/upload/v1723191383/logohero_nsqj8h.png",

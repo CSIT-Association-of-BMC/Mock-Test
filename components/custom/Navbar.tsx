@@ -98,19 +98,30 @@ const Navbar = () => {
           const data = await response.json();
           if (data.authenticated) {
             setUser(data.user);
+          } else {
+            setUser(null);
           }
         }
       } catch (err) {
         console.error("Auth check failed:", err);
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
+    const handleAuthChange = () => {
+      checkAuth();
+    };
+
     window.addEventListener("resize", handleResize);
+    window.addEventListener("authChange", handleAuthChange);
     checkAuth();
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("authChange", handleAuthChange);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -120,6 +131,8 @@ const Navbar = () => {
         credentials: "include",
       });
       setUser(null);
+      // Dispatch custom event to update navbar
+      window.dispatchEvent(new CustomEvent("authChange"));
       router.push("/");
     } catch (err) {
       console.error("Logout failed:", err);
