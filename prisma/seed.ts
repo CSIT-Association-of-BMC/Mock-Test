@@ -26,19 +26,18 @@ async function main() {
     console.log('✓ Created subjects');
 
     // Create default admin
-    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const hashedPassword = await bcrypt.hash('CSITABMC@#1212jkds!', 10);
     await prisma.admin.upsert({
-        where: { email: 'admin@csitabmc.com' },
+        where: { email: 'mock@csitabmc.com' },
         update: {},
         create: {
-            email: 'admin@csitabmc.com',
-            name: 'Admin',
+            email: 'mock@csitabmc.com',
+            name: 'CSITABMC Admin',
             password: hashedPassword,
             role: 'admin',
         },
     });
 
-    console.log('✓ Created default admin (email: admin@csitabmc.com, password: admin123)');
 
     // Create a question set for full mock test
     const questionSet = await prisma.questionSet.upsert({
@@ -63,13 +62,13 @@ async function main() {
         throw new Error('One or more subjects not found');
     }
 
-    // Generate questions for each subject (20 questions each = 100 total)
+    // Generate questions for each subject (25 Physics, 25 Chemistry, 25 Maths, 15 English, 10 Computer = 100 total)
     const allQuestions = [
-        ...generatePhysicsQuestions(physics.id, questionSet.id),
-        ...generateChemistryQuestions(chemistry.id, questionSet.id),
-        ...generateMathematicsQuestions(mathematics.id, questionSet.id),
-        ...generateEnglishQuestions(english.id, questionSet.id),
-        ...generateComputerScienceQuestions(computerScience.id, questionSet.id),
+        ...generatePhysicsQuestions(physics.id, questionSet.id, 25),
+        ...generateChemistryQuestions(chemistry.id, questionSet.id, 25),
+        ...generateMathematicsQuestions(mathematics.id, questionSet.id, 25),
+        ...generateEnglishQuestions(english.id, questionSet.id, 15),
+        ...generateComputerScienceQuestions(computerScience.id, questionSet.id, 10),
     ];
 
     for (const question of allQuestions) {
@@ -78,12 +77,12 @@ async function main() {
         });
     }
 
-    console.log('✓ Created 100 questions across all subjects (20 each)');
+    console.log('✓ Created 100 questions: 25 Physics, 25 Chemistry, 25 Maths, 15 English, 10 Computer Science');
 
     console.log('Database seeding completed!');
 }
 
-function generatePhysicsQuestions(subjectId: string, questionSetId: string) {
+function generatePhysicsQuestions(subjectId: string, questionSetId: string, count: number) {
     const questions = [];
 
     const physicsQuestions = [
@@ -109,7 +108,8 @@ function generatePhysicsQuestions(subjectId: string, questionSetId: string) {
         { question: 'What is the escape velocity from Earth?', options: ['7.9 km/s', '11.2 km/s', '15.6 km/s', '9.8 km/s'], answer: 1 },
     ];
 
-    for (const q of physicsQuestions) {
+    for (let i = 0; i < Math.min(count, physicsQuestions.length); i++) {
+        const q = physicsQuestions[i];
         questions.push({
             text: q.question,
             options: q.options,
@@ -122,7 +122,7 @@ function generatePhysicsQuestions(subjectId: string, questionSetId: string) {
     return questions;
 }
 
-function generateChemistryQuestions(subjectId: string, questionSetId: string) {
+function generateChemistryQuestions(subjectId: string, questionSetId: string, count: number) {
     const questions = [];
 
     const chemistryQuestions = [
@@ -148,7 +148,8 @@ function generateChemistryQuestions(subjectId: string, questionSetId: string) {
         { question: 'Which type of reaction releases energy?', options: ['Endothermic', 'Exothermic', 'Neutralization', 'Precipitation'], answer: 1 },
     ];
 
-    for (const q of chemistryQuestions) {
+    for (let i = 0; i < Math.min(count, chemistryQuestions.length); i++) {
+        const q = chemistryQuestions[i];
         questions.push({
             text: q.question,
             options: q.options,
@@ -161,7 +162,7 @@ function generateChemistryQuestions(subjectId: string, questionSetId: string) {
     return questions;
 }
 
-function generateMathematicsQuestions(subjectId: string, questionSetId: string) {
+function generateMathematicsQuestions(subjectId: string, questionSetId: string, count: number) {
     const questions = [];
 
     const mathQuestions = [
@@ -187,7 +188,8 @@ function generateMathematicsQuestions(subjectId: string, questionSetId: string) 
         { question: 'What is the perimeter of a square with side 4?', options: ['8', '12', '16', '20'], answer: 2 },
     ];
 
-    for (const q of mathQuestions) {
+    for (let i = 0; i < Math.min(count, mathQuestions.length); i++) {
+        const q = mathQuestions[i];
         questions.push({
             text: q.question,
             options: q.options,
@@ -200,7 +202,7 @@ function generateMathematicsQuestions(subjectId: string, questionSetId: string) 
     return questions;
 }
 
-function generateEnglishQuestions(subjectId: string, questionSetId: string) {
+function generateEnglishQuestions(subjectId: string, questionSetId: string, count: number) {
     const questions = [];
 
     const englishQuestions = [
@@ -226,7 +228,8 @@ function generateEnglishQuestions(subjectId: string, questionSetId: string) {
         { question: 'What is the comparative form of "good"?', options: ['Gooder', 'Better', 'Best', 'Goodest'], answer: 1 },
     ];
 
-    for (const q of englishQuestions) {
+    for (let i = 0; i < Math.min(count, englishQuestions.length); i++) {
+        const q = englishQuestions[i];
         questions.push({
             text: q.question,
             options: q.options,
@@ -239,7 +242,7 @@ function generateEnglishQuestions(subjectId: string, questionSetId: string) {
     return questions;
 }
 
-function generateComputerScienceQuestions(subjectId: string, questionSetId: string) {
+function generateComputerScienceQuestions(subjectId: string, questionSetId: string, count: number) {
     const questions = [];
 
     const csQuestions = [
@@ -265,7 +268,8 @@ function generateComputerScienceQuestions(subjectId: string, questionSetId: stri
         { question: 'Which algorithm is used for finding shortest path?', options: ['Binary Search', 'Dijkstra\'s', 'Bubble Sort', 'Quick Sort'], answer: 1 },
     ];
 
-    for (const q of csQuestions) {
+    for (let i = 0; i < Math.min(count, csQuestions.length); i++) {
+        const q = csQuestions[i];
         questions.push({
             text: q.question,
             options: q.options,

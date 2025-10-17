@@ -30,7 +30,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/practice">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 h-auto rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 h-auto shadow-lg hover:shadow-xl transition-all duration-200">
                 Start Practicing
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
@@ -38,7 +38,7 @@ export default function Home() {
             <Link href="/dashboard">
               <Button
                 variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 text-lg px-8 py-4 h-auto rounded-xl"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 text-lg px-8 py-4 h-auto rounded-sm"
               >
                 View Dashboard
               </Button>
@@ -144,7 +144,7 @@ export default function Home() {
             B.Sc. CSIT entrance exam using our platform
           </p>
           <Link href="/practice">
-            <Button className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-4 h-auto rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
+            <Button className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-4 h-auto rounded-sm shadow-lg hover:shadow-xl transition-all duration-200">
               Get Started Now
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>

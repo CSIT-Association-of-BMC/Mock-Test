@@ -210,7 +210,8 @@ export default function FullMockTestPage() {
               <div>
                 <h3 className="font-semibold text-purple-900">100 Questions</h3>
                 <p className="text-sm text-purple-800">
-                  20 questions each from 5 subjects
+                  25 Physics, 25 Chemistry, 25 Maths, 15 English, 10 Computer
+                  Science
                 </p>
               </div>
             </div>

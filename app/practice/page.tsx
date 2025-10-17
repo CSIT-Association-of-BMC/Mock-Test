@@ -60,23 +60,23 @@ export default function PracticePage() {
               <div className="ml-8 space-y-2 text-sm text-gray-600">
                 <div className="flex justify-between">
                   <span>• Physics</span>
-                  <span className="font-medium">20 Questions</span>
+                  <span className="font-medium">25 Questions</span>
                 </div>
                 <div className="flex justify-between">
                   <span>• Chemistry</span>
-                  <span className="font-medium">20 Questions</span>
+                  <span className="font-medium">25 Questions</span>
                 </div>
                 <div className="flex justify-between">
                   <span>• Mathematics</span>
-                  <span className="font-medium">20 Questions</span>
+                  <span className="font-medium">25 Questions</span>
                 </div>
                 <div className="flex justify-between">
                   <span>• English</span>
-                  <span className="font-medium">20 Questions</span>
+                  <span className="font-medium">15 Questions</span>
                 </div>
                 <div className="flex justify-between">
                   <span>• Computer Science</span>
-                  <span className="font-medium">20 Questions</span>
+                  <span className="font-medium">10 Questions</span>
                 </div>
               </div>
             </div>
@@ -173,66 +173,6 @@ export default function PracticePage() {
             <div className="text-center">
               <p className="text-sm text-gray-500">
                 Unlimited practice • No time limit • Instant feedback
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* How It Works Section */}
-        <div className="bg-gray-50 rounded-2xl p-8 md:p-12">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-              How It Works
-            </h3>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Our unique flow allows you to practice without commitment, then
-              save your results when you're ready.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                  1
-                </div>
-              </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">
-                Take the Test
-              </h4>
-              <p className="text-gray-600 leading-relaxed">
-                Answer questions without logging in. Your progress is
-                automatically saved locally in your browser.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                  2
-                </div>
-              </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">
-                Submit & Review
-              </h4>
-              <p className="text-gray-600 leading-relaxed">
-                Submit your test and instantly see your score breakdown with
-                detailed subject-wise analysis.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                  3
-                </div>
-              </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">
-                Save Results
-              </h4>
-              <p className="text-gray-600 leading-relaxed">
-                Create an account or login to permanently save your results and
-                track your progress over time.
               </p>
             </div>
           </div>
