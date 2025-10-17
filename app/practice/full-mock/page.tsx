@@ -173,7 +173,7 @@ export default function FullMockTestPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <p className="text-gray-600">Loading test questions...</p>
         </div>
       </div>
@@ -197,7 +197,7 @@ export default function FullMockTestPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <p className="text-lg text-gray-600">
             Processing, analyzing answers...
           </p>
@@ -208,19 +208,19 @@ export default function FullMockTestPage() {
 
   if (!testStarted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 px-4">
         <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
             Full Mock Test - Instructions
           </h1>
           <div className="space-y-4 mb-8">
-            <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg">
-              <Clock className="w-6 h-6 text-blue-600 mt-1" />
+            <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
+              <Clock className="w-6 h-6 text-primary mt-1" />
               <div>
-                <h3 className="font-semibold text-blue-900">
+                <h3 className="font-semibold text-primary">
                   Duration: 2 Hours
                 </h3>
-                <p className="text-sm text-blue-800">
+                <p className="text-sm text-primary/80">
                   Timer starts when you click "Start Test"
                 </p>
               </div>
@@ -247,10 +247,7 @@ export default function FullMockTestPage() {
             </div>
           </div>
           <div className="space-y-3">
-            <Button
-              onClick={handleStartTest}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-lg py-6"
-            >
+            <Button onClick={handleStartTest} className="w-full text-lg py-6">
               I'm Ready - Start Test
             </Button>
             <Button
@@ -316,7 +313,7 @@ export default function FullMockTestPage() {
           <div className="mt-3">
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="bg-indigo-600 h-2 rounded-full transition-all"
+                className="bg-primary h-2 rounded-full transition-all"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
@@ -328,7 +325,7 @@ export default function FullMockTestPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
           <div className="mb-4">
-            <span className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
+            <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium border border-primary/20">
               {currentQ.subjectName}
             </span>
           </div>
@@ -342,8 +339,8 @@ export default function FullMockTestPage() {
                 onClick={() => handleAnswerSelect(index)}
                 className={`w-full text-left p-4 rounded-lg border-2 transition ${
                   answers[currentQuestion] === index
-                    ? "border-indigo-600 bg-indigo-50"
-                    : "border-gray-200 hover:border-indigo-300"
+                    ? "border-primary bg-primary/5"
+                    : "border-gray-200 hover:border-primary/30"
                 }`}
               >
                 <span className="font-medium text-gray-700">
@@ -381,7 +378,7 @@ export default function FullMockTestPage() {
                   onClick={() => setCurrentQuestion(questionIndex)}
                   className={`w-8 h-8 rounded text-xs font-medium ${
                     questionIndex === currentQuestion
-                      ? "bg-indigo-600 text-white"
+                      ? "bg-primary text-white"
                       : answers[questionIndex] !== null
                       ? "bg-green-100 text-green-800 border border-green-300"
                       : "bg-gray-100 text-gray-600 border border-gray-300"
@@ -394,10 +391,7 @@ export default function FullMockTestPage() {
           </div>
 
           {currentQuestion < testData.questions.length - 1 ? (
-            <Button
-              onClick={() => setCurrentQuestion((prev) => prev + 1)}
-              className="bg-indigo-600 hover:bg-indigo-700"
-            >
+            <Button onClick={() => setCurrentQuestion((prev) => prev + 1)}>
               Next
             </Button>
           ) : (

@@ -15,13 +15,13 @@ export default function Home() {
       {/* Hero Section */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-8">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8">
             <CheckCircle className="w-4 h-4" />
             B.Sc. CSIT Entrance Exam Preparation
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             Practice Your
-            <span className="block text-blue-600">CSIT Entrance Exam</span>
+            <span className="block text-primary">CSIT Entrance Exam</span>
           </h1>
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
             A comprehensive online practice platform by{" "}
@@ -31,7 +31,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/practice">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 h-auto shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer">
+              <Button className="text-white text-lg px-8 py-4 h-auto shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer">
                 Start Practicing
               </Button>
             </Link>
@@ -60,8 +60,8 @@ export default function Home() {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center hover:shadow-lg transition-shadow duration-200">
-            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Target className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Target className="w-8 h-8 text-primary" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-3">
               Full Mock Tests
@@ -118,15 +118,15 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">100</div>
+              <div className="text-4xl font-bold text-primary mb-2">100</div>
               <div className="text-gray-600">Questions per Test</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">5</div>
+              <div className="text-4xl font-bold text-primary mb-2">5</div>
               <div className="text-gray-600">Core Subjects</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">120</div>
+              <div className="text-4xl font-bold text-primary mb-2">120</div>
               <div className="text-gray-600">Minutes Duration</div>
             </div>
           </div>
@@ -135,16 +135,16 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-3xl shadow-2xl p-12 text-center text-white">
+        <div className="bg-gradient-to-r from-primary to-primary/90 rounded-3xl shadow-2xl p-12 text-center text-white">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Ace Your Exam?
           </h2>
-          <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-primary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
             Join thousands of students who have successfully prepared for their
             B.Sc. CSIT entrance exam using our platform
           </p>
           <Link href="/practice">
-            <Button className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-4 h-auto rounded-sm shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer">
+            <Button className="bg-white text-primary hover:bg-gray-100 text-lg px-8 py-4 h-auto rounded-sm shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer">
               Get Started Now
             </Button>
           </Link>

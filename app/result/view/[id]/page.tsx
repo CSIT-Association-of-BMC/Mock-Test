@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Trophy, TrendingUp, Calendar, BookOpen } from "lucide-react";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -77,8 +76,9 @@ export default async function ResultViewPage({ params }: PageProps) {
   const attemptData = JSON.parse(result.attemptDetails);
 
   // Calculate subject-wise breakdown for full mock tests
-  const subjectBreakdown: { [key: string]: { correct: number; total: number } } =
-    {};
+  const subjectBreakdown: {
+    [key: string]: { correct: number; total: number };
+  } = {};
 
   if (result.testType === "full_mock" && attemptData.answers) {
     // Fetch questions with subjects
@@ -104,11 +104,11 @@ export default async function ResultViewPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Test Results
           </h1>
           <p className="text-gray-600">
@@ -119,23 +119,16 @@ export default async function ResultViewPage({ params }: PageProps) {
         </div>
 
         {/* Score Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 text-center">
-          <div className="flex justify-center mb-4">
-            <Trophy className="w-16 h-16 text-yellow-500" />
-          </div>
-          <h2 className="text-5xl font-bold text-indigo-600 mb-2">
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6 text-center">
+          <h2 className="text-4xl font-bold text-gray-900 mb-2">
             {percentage}%
           </h2>
-          <p className="text-xl text-gray-600 mb-4">
+          <p className="text-lg text-gray-600 mb-4">
             {result.score} out of {result.totalQuestions} correct
           </p>
           <div className="flex justify-center gap-6 text-sm text-gray-600">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              {new Date(result.dateTaken).toLocaleDateString()}
-            </div>
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
+            <div>{new Date(result.dateTaken).toLocaleDateString()}</div>
+            <div>
               {result.testType === "full_mock"
                 ? "Full Mock Test"
                 : "Subject-Wise Practice"}
@@ -144,29 +137,26 @@ export default async function ResultViewPage({ params }: PageProps) {
         </div>
 
         {/* Performance Analysis */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <TrendingUp className="w-6 h-6 text-green-600" />
-              <h3 className="text-xl font-semibold text-gray-900">
-                Performance
-              </h3>
-            </div>
-            <div className="space-y-3">
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Performance
+            </h3>
+            <div className="space-y-4">
               <div>
-                <div className="flex justify-between mb-1">
+                <div className="flex justify-between mb-2">
                   <span className="text-sm text-gray-600">Accuracy</span>
                   <span className="text-sm font-semibold">{percentage}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className="bg-green-500 h-2 rounded-full"
+                    className="bg-primary h-2 rounded-full"
                     style={{ width: `${percentage}%` }}
                   ></div>
                 </div>
               </div>
               <div>
-                <div className="flex justify-between mb-1">
+                <div className="flex justify-between mb-2">
                   <span className="text-sm text-gray-600">
                     Questions Attempted
                   </span>
@@ -175,26 +165,26 @@ export default async function ResultViewPage({ params }: PageProps) {
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full w-full"></div>
+                  <div className="bg-primary h-2 rounded-full w-full"></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Statistics
             </h3>
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Correct Answers</span>
-                <span className="font-semibold text-green-600">
+                <span className="font-semibold text-gray-900">
                   {result.score}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Wrong Answers</span>
-                <span className="font-semibold text-red-600">
+                <span className="font-semibold text-gray-900">
                   {result.totalQuestions - result.score}
                 </span>
               </div>
@@ -211,8 +201,8 @@ export default async function ResultViewPage({ params }: PageProps) {
         {/* Subject-Wise Breakdown (for full mock tests) */}
         {result.testType === "full_mock" &&
           Object.keys(subjectBreakdown).length > 0 && (
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Subject-Wise Performance
               </h3>
               <div className="space-y-4">
@@ -232,7 +222,7 @@ export default async function ResultViewPage({ params }: PageProps) {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-indigo-600 h-2 rounded-full transition-all"
+                          className="bg-primary h-2 rounded-full transition-all"
                           style={{ width: `${subjectPercentage}%` }}
                         ></div>
                       </div>
@@ -243,15 +233,34 @@ export default async function ResultViewPage({ params }: PageProps) {
             </div>
           )}
 
+        {/* View Detailed Answers */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Review Your Answers
+            </h3>
+            <p className="text-gray-600 mb-4">
+              View detailed answers and explanations for all questions
+            </p>
+            <Link href={`/result/answers/${id}`}>
+              <Button className="bg-primary hover:bg-primary/90 cursor-pointer">
+                View Detailed Answers
+              </Button>
+            </Link>
+          </div>
+        </div>
+
         {/* Actions */}
         <div className="flex gap-4 justify-center">
           <Link href="/practice">
-            <Button className="bg-indigo-600 hover:bg-indigo-700">
+            <Button className="bg-primary hover:bg-primary/90 cursor-pointer">
               Take Another Test
             </Button>
           </Link>
           <Link href="/dashboard">
-            <Button variant="outline">View All Results</Button>
+            <Button variant="outline" className="cursor-pointer">
+              View All Results
+            </Button>
           </Link>
         </div>
       </div>

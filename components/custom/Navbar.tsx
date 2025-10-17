@@ -193,22 +193,17 @@ function MobileView({
 
   return (
     <SheetContent className="w-[280px] sm:w-[400px] px-0 bg-white overflow-y-auto">
-      <SheetHeader className="px-6 pb-6 border-b border-gray-200">
+      <SheetHeader className="px-6 pb-3 border-b border-gray-200">
         <SheetTitle className="text-left flex items-center gap-3">
-          {/* <Image
+          <Image
             src="https://res.cloudinary.com/dol8m5gx7/image/upload/v1723191383/logohero_nsqj8h.png"
             alt="CSITABMC Logo"
             height={32}
             width={32}
             className="rounded-lg"
-          /> */}
-          <span className="text-lg font-semibold text-gray-900">
-            Console Soft
-          </span>
+          />
+          <span className="text-lg font-semibold text-gray-900">CSITABMC</span>
         </SheetTitle>
-        <SheetDescription className="text-left text-gray-600">
-          Navigate through our documentation and resources
-        </SheetDescription>
       </SheetHeader>
 
       <div className="px-6 py-6">

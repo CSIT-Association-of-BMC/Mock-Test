@@ -150,7 +150,7 @@ export default function SubjectMockTestPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           <p className="mt-4 text-gray-600">Loading questions...</p>
         </div>
       </div>
@@ -175,7 +175,7 @@ export default function SubjectMockTestPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           <p className="mt-4 text-lg text-gray-600">
             Processing, analyzing answers...
           </p>
@@ -199,7 +199,7 @@ export default function SubjectMockTestPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">
+                  <div className="text-3xl font-bold text-primary mb-2">
                     {getScore()}/{testResults.length}
                   </div>
                   <p className="text-gray-600">Correct Answers</p>
@@ -384,7 +384,7 @@ export default function SubjectMockTestPage() {
                 {currentQuestion?.options.map((option, index) => {
                   const buttonClass =
                     answers[currentQuestionIndex] === index
-                      ? "w-full text-left p-4 border-2 border-blue-500 bg-blue-50 rounded-lg transition-all"
+                      ? "w-full text-left p-4 border-2 border-primary bg-primary/5 rounded-lg transition-all"
                       : "w-full text-left p-4 border border-gray-200 hover:border-gray-300 rounded-lg transition-all";
 
                   return (

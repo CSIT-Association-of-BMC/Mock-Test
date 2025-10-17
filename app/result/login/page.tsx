@@ -74,6 +74,11 @@ export default function ResultLoginPage() {
       return;
     }
 
+    if (formData.howHeard === "other" && !formData.howHeardOther.trim()) {
+      setError("Please specify how you heard about us");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -152,7 +157,7 @@ export default function ResultLoginPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -160,7 +165,7 @@ export default function ResultLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-primary/10 py-12 px-4">
       <div className="max-w-md mx-auto">
         {/* Auth Form */}
         <div className="bg-white rounded-xl shadow-lg p-8">
@@ -169,7 +174,7 @@ export default function ResultLoginPage() {
               onClick={() => setMode("login")}
               className={`flex-1 py-2 font-semibold ${
                 mode === "login"
-                  ? "border-b-2 border-indigo-600 text-indigo-600"
+                  ? "border-b-2 border-primary text-primary"
                   : "text-gray-600"
               }`}
             >
@@ -179,7 +184,7 @@ export default function ResultLoginPage() {
               onClick={() => setMode("register")}
               className={`flex-1 py-2 font-semibold ${
                 mode === "register"
-                  ? "border-b-2 border-indigo-600 text-indigo-600"
+                  ? "border-b-2 border-primary text-primary"
                   : "text-gray-600"
               }`}
             >
@@ -204,7 +209,7 @@ export default function ResultLoginPage() {
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   required
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
                   placeholder="your@email.com"
                 />
               </div>
@@ -220,7 +225,7 @@ export default function ResultLoginPage() {
                       handleInputChange("password", e.target.value)
                     }
                     required
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
                     placeholder="••••••••"
                   />
                   <button
@@ -236,11 +241,7 @@ export default function ResultLoginPage() {
                   </button>
                 </div>
               </div>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-indigo-600 hover:bg-indigo-700"
-              >
+              <Button type="submit" disabled={loading} className="w-full">
                 {loading ? "Logging in..." : "Login & View Results"}
               </Button>
             </form>
@@ -255,7 +256,7 @@ export default function ResultLoginPage() {
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   required
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
                   placeholder="John Doe"
                 />
               </div>
@@ -268,7 +269,7 @@ export default function ResultLoginPage() {
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   required
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
                   placeholder="your@email.com"
                 />
               </div>
@@ -285,7 +286,7 @@ export default function ResultLoginPage() {
                     }
                     required
                     minLength={6}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
                     placeholder="••••••••"
                   />
                   <button
@@ -311,7 +312,7 @@ export default function ResultLoginPage() {
                   onChange={(e) =>
                     handleInputChange("priorityCollege", e.target.value)
                   }
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
                   placeholder="e.g.  Butwal Multiple Campus"
                 />
               </div>
@@ -324,7 +325,7 @@ export default function ResultLoginPage() {
                   onChange={(e) =>
                     handleInputChange("howHeard", e.target.value)
                   }
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Select an option</option>
                   <option value="friend">Friend/Word of Mouth</option>
@@ -334,11 +335,24 @@ export default function ResultLoginPage() {
                   <option value="other">Other</option>
                 </select>
               </div>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-indigo-600 hover:bg-indigo-700"
-              >
+              {formData.howHeard === "other" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Please specify <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.howHeardOther}
+                    onChange={(e) =>
+                      handleInputChange("howHeardOther", e.target.value)
+                    }
+                    required
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+                    placeholder="How did you hear about us?"
+                  />
+                </div>
+              )}
+              <Button type="submit" disabled={loading} className="w-full">
                 {loading ? "Registering..." : "Register & View Results"}
               </Button>
             </form>
