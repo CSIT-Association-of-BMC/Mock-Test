@@ -45,23 +45,23 @@ const NavLinks = [
     children: [
       {
         title: "Physics",
-        href: "/subjects/physics",
+        href: "/practice/subject/physics",
       },
       {
         title: "Chemistry",
-        href: "/subjects/chemistry",
+        href: "/practice/subject/chemistry",
       },
       {
         title: "Mathematics",
-        href: "/subjects/mathematics",
+        href: "/practice/subject/mathematics",
       },
       {
         title: "Computer",
-        href: "/subjects/computer",
+        href: "/practice/subject/computer",
       },
       {
         title: "English",
-        href: "/subjects/english",
+        href: "/practice/subject/english",
       },
     ],
   },

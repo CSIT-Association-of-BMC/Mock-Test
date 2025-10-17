@@ -79,18 +79,24 @@ export default function SubjectMockTestPage() {
     if (selectedAnswer === null || !questions[currentQuestionIndex]) return;
 
     try {
-      // Get the correct answer from the API
-      const response = await fetch(`/api/questions/subject/${subjectName}`);
+      const response = await fetch("/api/questions/check-answer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          questionId: questions[currentQuestionIndex].id,
+          selectedAnswer,
+        }),
+      });
+
       if (response.ok) {
         const data = await response.json();
-        const currentQuestion = data.questions[currentQuestionIndex];
-        const correctAnswerIndex = currentQuestion.correctAnswerIndex;
-
         const result: TestResult = {
           questionId: questions[currentQuestionIndex].id,
           selectedAnswer,
-          isCorrect: selectedAnswer === correctAnswerIndex,
-          correctAnswer: correctAnswerIndex,
+          isCorrect: data.isCorrect,
+          correctAnswer: data.correctAnswer,
         };
 
         setTestResults((prev) => [...prev, result]);
