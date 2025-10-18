@@ -23,7 +23,7 @@ export default function Home() {
             Practice Your
             <span className="block text-primary">CSIT Entrance Exam</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-md sm:text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
             A comprehensive online practice platform by{" "}
             <strong>CSIT Association of BMC</strong>, featuring full mock tests,
             subject wise practice designed to help learners evaluate and

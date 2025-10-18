@@ -111,7 +111,7 @@ export default function PracticePage() {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Choose Your Practice Mode
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-md sm:text-xl text-gray-600 max-w-3xl mx-auto">
             Select from full mock tests or subject-wise practice to build your
             confidence and track your progress in the B.Sc. CSIT entrance exam.
           </p>
@@ -195,20 +195,22 @@ export default function PracticePage() {
           </div>
 
           {/* Subject-Wise Practice Card */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-8 hover:shadow-xl hover:border-blue-200 transition-all duration-200">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center justify-center w-16 h-16 bg-green-50 rounded-2xl">
-                <BookOpen className="w-8 h-8 text-green-600" />
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 hover:shadow-xl hover:border-blue-200 transition-all duration-200">
+            <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-50 rounded-2xl">
+                <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   Subject Practice
                 </h2>
-                <p className="text-gray-600">Focus on individual subjects</p>
+                <p className="text-sm sm:text-base text-gray-600">
+                  Focus on individual subjects
+                </p>
               </div>
             </div>
 
-            <p className="text-gray-600 mb-8 leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 leading-relaxed">
               Strengthen your weak areas by practicing specific subjects. Each
               subject contains targeted questions to help you master individual
               topics.
@@ -253,7 +255,7 @@ export default function PracticePage() {
                     router.push(`/practice/subject/${subject.path}`)
                   }
                   variant="outline"
-                  className={`w-full justify-between border-2 ${subject.color} hover:shadow-md transition-all duration-200 py-4 rounded-sm`}
+                  className={`w-full justify-between border-2 ${subject.color} hover:shadow-md transition-all duration-200 py-3 sm:py-4 rounded-sm text-sm sm:text-base`}
                 >
                   <span className="font-medium">{subject.name}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -262,7 +264,7 @@ export default function PracticePage() {
             </div>
 
             <div className="text-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-xs sm:text-sm text-gray-500">
                 Unlimited practice • No time limit • Instant feedback
               </p>
             </div>
