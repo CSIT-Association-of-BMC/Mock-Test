@@ -15,6 +15,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
 
 export default function PracticePage() {
@@ -26,7 +29,7 @@ export default function PracticePage() {
   const [isFetching, setIsFetching] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState<"recent" | "name" | "size">("recent");
+  const [sort, setSort] = useState<"recent" | "oldest">("recent");
 
   const openSetsDialog = async () => {
     try {
@@ -83,11 +86,10 @@ export default function PracticePage() {
       const q = query.toLowerCase();
       list = list.filter((s) => s.setName.toLowerCase().includes(q));
     }
-    if (sort === "name")
-      list.sort((a, b) => a.setName.localeCompare(b.setName));
-    else if (sort === "size")
+    if (sort === "oldest")
       list.sort(
-        (a, b) => (b._count?.questions || 0) - (a._count?.questions || 0)
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       );
     else
       list.sort(
@@ -171,7 +173,7 @@ export default function PracticePage() {
             </div>
 
             <div className="space-y-3 sm:space-y-4">
-              <div className="p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-sm">
                 <div className="flex items-start gap-2 sm:gap-3">
                   <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 mt-0.5" />
                   <div className="text-sm sm:text-sm text-amber-800">
@@ -266,115 +268,139 @@ export default function PracticePage() {
             </div>
           </div>
         </div>
-        {/* Dialog for selecting question set */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {dialogMode === "no-sets"
-                  ? "No Active Sets"
-                  : "Choose Question Set"}
-              </DialogTitle>
-            </DialogHeader>
+          <DialogContent className="w-full max-w-[95vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-[70vh] lg:h-[80vh] sm:h-auto overflow-hidden p-4 sm:p-6">
+            <div className="flex items-start justify-between gap-2 sm:gap-4">
+              <div>
+                <DialogHeader className="space-y-1 sm:space-y-2">
+                  <DialogTitle className="text-base sm:text-lg">
+                    {dialogMode === "no-sets"
+                      ? "No Active Sets"
+                      : "Choose Question Set"}
+                  </DialogTitle>
+                  <DialogDescription className="text-xs sm:text-sm text-gray-600">
+                    Select which active question set you'd like to run. You can
+                    search, sort, and preview subjects included in each set.
+                  </DialogDescription>
+                </DialogHeader>
+              </div>
+              <div className="flex items-start gap-2">
+                <DialogClose className="rounded-md p-1 hover:bg-gray-100">
+                  <span className="sr-only">Close</span>
+                </DialogClose>
+              </div>
+            </div>
 
             {dialogMode === "no-sets" ? (
-              <div className="space-y-4">
-                <p className="text-sm text-gray-600">
+              <div className="mt-2 sm:mt-4 space-y-2 sm:space-y-4">
+                <p className="text-xs sm:text-sm text-gray-600">
                   There are no active question sets available right now. Please
-                  check back later.
+                  check back later or create a new set from the dashboard.
                 </p>
                 <div className="flex gap-2 justify-end">
-                  <Button onClick={() => setDialogOpen(false)}>Close</Button>
+                  <Button
+                    onClick={() => setDialogOpen(false)}
+                    size="sm"
+                    className="text-xs sm:text-sm"
+                  >
+                    Close
+                  </Button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
+              <div className="-mt-8 sm:mt-4 space-y-2 sm:space-y-4 flex-1 flex flex-col min-h-0 rounded-sm">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 rounded-sm">
                   <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search sets..."
-                    className="flex-1 rounded-md border px-3 py-2 text-sm"
+                    className="flex-1 rounded-sm border px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm shadow-sm focus:ring-2 focus:ring-primary/40"
                   />
                   <select
                     value={sort}
                     onChange={(e) => setSort(e.target.value as any)}
-                    className="rounded-md border px-2 py-2 text-sm"
+                    className="rounded-sm border px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm shadow-sm"
                   >
                     <option value="recent">Most Recent</option>
-                    <option value="name">Name</option>
-                    <option value="size">Size</option>
+                    <option value="oldest">Oldest</option>
                   </select>
                 </div>
 
-                <div className="max-h-60 overflow-auto">
-                  {isFetching ? (
-                    <div className="flex items-center justify-center p-6">
-                      <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
-                    </div>
-                  ) : (
-                    filteredSortedSets.map((s, i) => (
-                      <div
-                        key={s.id}
-                        className={`flex items-center justify-between gap-3 p-3 rounded-md cursor-pointer hover:bg-gray-50 ${
-                          selectedIndex === i
-                            ? "ring-2 ring-primary/50 bg-primary/5"
-                            : ""
-                        }`}
-                        onClick={() => setSelectedIndex(i)}
-                      >
-                        <div className="flex items-center gap-3">
-                          {/* Avatar: first letter */}
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                            {s.setName?.[0] || "#"}
-                          </div>
-                          <div>
-                            <div className="font-medium">{s.setName}</div>
-                            <div className="text-xs text-gray-500">
-                              {s._count?.questions || 0} questions
-                            </div>
-                            <div className="mt-1 flex gap-2">
-                              {/* subject badges (unique subjects in set) */}
-                              {(() => {
-                                const subs = (s.questions || [])
-                                  .map((q: any) => q.subject?.name)
-                                  .filter(Boolean) as string[];
-                                const unique = Array.from(new Set(subs));
-                                return unique.map((sub: string) => (
-                                  <span
-                                    key={sub}
-                                    className="text-xs bg-gray-100 px-2 py-0.5 rounded-full text-gray-700"
-                                  >
-                                    {sub}
-                                  </span>
-                                ));
-                              })()}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {new Date(s.createdAt).toLocaleDateString()}
-                        </div>
+                <div className="flex-1 min-h-0 overflow-hidden">
+                  <div className="max-h-32 sm:max-h-48 md:max-h-64 lg:max-h-72 overflow-y-auto divide-y rounded-md border border-gray-100 bg-white shadow-sm">
+                    {isFetching ? (
+                      <div className="flex items-center justify-center p-4 sm:p-6">
+                        <div className="inline-block animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary" />
                       </div>
-                    ))
-                  )}
+                    ) : (
+                      filteredSortedSets.map((s, i) => (
+                        <div
+                          key={s.id}
+                          className={`flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-4 cursor-pointer transition hover:bg-gray-50 ${
+                            selectedIndex === i
+                              ? "bg-primary/5 ring-2 ring-primary/30"
+                              : ""
+                          }`}
+                          onClick={() => setSelectedIndex(i)}
+                        >
+                          <div className="flex items-center gap-2 sm:gap-4">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm sm:text-base md:text-lg">
+                              {s.setName?.[0]?.toUpperCase() || "#"}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="font-semibold text-gray-900 text-xs sm:text-sm md:text-base truncate">
+                                {s.setName}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1 flex items-center gap-2 sm:gap-3">
+                                <span className="text-xs">
+                                  {s._count?.questions || 0} questions
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end text-right">
+                            <div className="text-xs text-gray-500">
+                              {new Date(s.createdAt).toLocaleDateString()}
+                            </div>
+                            <div className="mt-1">
+                              {selectedIndex === i ? (
+                                <span className="text-xs text-primary font-semibold">
+                                  Selected
+                                </span>
+                              ) : (
+                                <span className="text-xs text-gray-400">
+                                  &nbsp;
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex gap-2 justify-end">
-                  <Button
-                    variant="outline"
-                    onClick={() => setDialogOpen(false)}
-                    disabled={isNavigating}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={confirmSelection}
-                    disabled={selectedIndex == null || isNavigating}
-                  >
-                    {isNavigating ? "Starting..." : "Start Selected"}
-                  </Button>
-                </div>
+                <DialogFooter className="pt-2 sm:pt-4">
+                  <div className="flex gap-2 justify-end w-full">
+                    <Button
+                      variant="outline"
+                      onClick={() => setDialogOpen(false)}
+                      disabled={isNavigating}
+                      size="sm"
+                      className="text-xs sm:text-sm"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={confirmSelection}
+                      disabled={selectedIndex == null || isNavigating}
+                      size="sm"
+                      className="text-xs sm:text-sm"
+                    >
+                      {isNavigating ? "Starting..." : "Start Selected"}
+                    </Button>
+                  </div>
+                </DialogFooter>
               </div>
             )}
           </DialogContent>
