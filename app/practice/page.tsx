@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,12 +8,94 @@ import {
   Clock,
   Target,
   ArrowRight,
-  CheckCircle,
   AlertTriangle,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function PracticePage() {
   const router = useRouter();
+  const [sets, setSets] = useState<any[] | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<"list" | "no-sets">("list");
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<"recent" | "name" | "size">("recent");
+
+  const openSetsDialog = async () => {
+    try {
+      setIsFetching(true);
+      const res = await fetch("/api/questions/sets");
+      if (!res.ok) {
+        // show no-sets dialog as fallback
+        setSets([]);
+        setDialogMode("no-sets");
+        setDialogOpen(true);
+        return;
+      }
+      const data = await res.json();
+      if (!data || data.length === 0) {
+        setSets([]);
+        setDialogMode("no-sets");
+        setDialogOpen(true);
+        return;
+      }
+
+      if (data.length === 1) {
+        // single set -> navigate directly
+        setIsNavigating(true);
+        router.push(`/practice/full-mock?setId=${data[0].id}`);
+        return;
+      }
+
+      // multiple sets -> show selection dialog
+      setSets(data);
+      setSelectedIndex(0);
+      setDialogMode("list");
+      setDialogOpen(true);
+    } catch (err) {
+      console.error(err);
+      setSets([]);
+      setDialogMode("no-sets");
+      setDialogOpen(true);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const confirmSelection = () => {
+    if (!sets || selectedIndex == null) return;
+    const set = sets[selectedIndex];
+    setIsNavigating(true);
+    router.push(`/practice/full-mock?setId=${set.id}`);
+  };
+
+  const filteredSortedSets = useMemo(() => {
+    if (!sets) return [];
+    let list = sets.slice();
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      list = list.filter((s) => s.setName.toLowerCase().includes(q));
+    }
+    if (sort === "name")
+      list.sort((a, b) => a.setName.localeCompare(b.setName));
+    else if (sort === "size")
+      list.sort(
+        (a, b) => (b._count?.questions || 0) - (a._count?.questions || 0)
+      );
+    else
+      list.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    return list;
+  }, [sets, query, sort]);
 
   return (
     <div className="min-h-screen bg-white py-12 px-4">
@@ -100,51 +183,7 @@ export default function PracticePage() {
               </div>
 
               <Button
-                onClick={async () => {
-                  // Fetch active sets
-                  try {
-                    const res = await fetch("/api/questions/sets");
-                    if (!res.ok) {
-                      alert("Failed to load question sets.");
-                      return;
-                    }
-                    const sets = await res.json();
-                    if (!sets || sets.length === 0) {
-                      alert("No active question sets available at the moment.");
-                      return;
-                    }
-
-                    if (sets.length === 1) {
-                      // Single set: go straight to test (server will pick up the set)
-                      router.push(`/practice/full-mock?setId=${sets[0].id}`);
-                      return;
-                    }
-
-                    // Multiple sets: ask user to pick one (quick prompt for now)
-                    const choices = sets
-                      .map(
-                        (s: any, i: number) =>
-                          `${i + 1}. ${s.setName} (${
-                            s._count?.questions || 0
-                          } Q)`
-                      )
-                      .join("\n");
-
-                    const input = prompt(
-                      `Multiple active sets found.\nChoose a set number:\n\n${choices}`
-                    );
-                    if (!input) return;
-                    const idx = parseInt(input, 10) - 1;
-                    if (isNaN(idx) || idx < 0 || idx >= sets.length) {
-                      alert("Invalid selection");
-                      return;
-                    }
-                    router.push(`/practice/full-mock?setId=${sets[idx].id}`);
-                  } catch (err) {
-                    console.error(err);
-                    alert("An error occurred while fetching sets.");
-                  }
-                }}
+                onClick={openSetsDialog}
                 className="w-full py-3 sm:py-4 rounded-sm shadow-lg text-sm sm:text-md hover:shadow-xl transition-all duration-200 cursor-pointer"
               >
                 Start Full Mock Test
@@ -191,7 +230,7 @@ export default function PracticePage() {
                   name: "Mathematics",
                   path: "mathematics",
                   color:
-                    "bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200",
+                    "bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200 cursor-pointer",
                 },
                 {
                   name: "English",
@@ -227,6 +266,119 @@ export default function PracticePage() {
             </div>
           </div>
         </div>
+        {/* Dialog for selecting question set */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {dialogMode === "no-sets"
+                  ? "No Active Sets"
+                  : "Choose Question Set"}
+              </DialogTitle>
+            </DialogHeader>
+
+            {dialogMode === "no-sets" ? (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  There are no active question sets available right now. Please
+                  check back later.
+                </p>
+                <div className="flex gap-2 justify-end">
+                  <Button onClick={() => setDialogOpen(false)}>Close</Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search sets..."
+                    className="flex-1 rounded-md border px-3 py-2 text-sm"
+                  />
+                  <select
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value as any)}
+                    className="rounded-md border px-2 py-2 text-sm"
+                  >
+                    <option value="recent">Most Recent</option>
+                    <option value="name">Name</option>
+                    <option value="size">Size</option>
+                  </select>
+                </div>
+
+                <div className="max-h-60 overflow-auto">
+                  {isFetching ? (
+                    <div className="flex items-center justify-center p-6">
+                      <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+                    </div>
+                  ) : (
+                    filteredSortedSets.map((s, i) => (
+                      <div
+                        key={s.id}
+                        className={`flex items-center justify-between gap-3 p-3 rounded-md cursor-pointer hover:bg-gray-50 ${
+                          selectedIndex === i
+                            ? "ring-2 ring-primary/50 bg-primary/5"
+                            : ""
+                        }`}
+                        onClick={() => setSelectedIndex(i)}
+                      >
+                        <div className="flex items-center gap-3">
+                          {/* Avatar: first letter */}
+                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                            {s.setName?.[0] || "#"}
+                          </div>
+                          <div>
+                            <div className="font-medium">{s.setName}</div>
+                            <div className="text-xs text-gray-500">
+                              {s._count?.questions || 0} questions
+                            </div>
+                            <div className="mt-1 flex gap-2">
+                              {/* subject badges (unique subjects in set) */}
+                              {(() => {
+                                const subs = (s.questions || [])
+                                  .map((q: any) => q.subject?.name)
+                                  .filter(Boolean) as string[];
+                                const unique = Array.from(new Set(subs));
+                                return unique.map((sub: string) => (
+                                  <span
+                                    key={sub}
+                                    className="text-xs bg-gray-100 px-2 py-0.5 rounded-full text-gray-700"
+                                  >
+                                    {sub}
+                                  </span>
+                                ));
+                              })()}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {new Date(s.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => setDialogOpen(false)}
+                    disabled={isNavigating}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={confirmSelection}
+                    disabled={selectedIndex == null || isNavigating}
+                  >
+                    {isNavigating ? "Starting..." : "Start Selected"}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

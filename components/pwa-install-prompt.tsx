@@ -93,8 +93,8 @@ export default function PWAInstallPrompt() {
               Install MockTest App
             </h3>
             <p className="text-xs text-gray-600 mt-1">
-              Get the full experience! Install our app for offline access and
-              better performance.
+              Get the full experience! Install our app for better access and
+              performance.
             </p>
             <div className="flex gap-2 mt-3">
               <Button

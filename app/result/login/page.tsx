@@ -37,8 +37,8 @@ export default function ResultLoginPage() {
             // User is already logged in, save the pending result directly
             const storedResult = localStorage.getItem("pendingTestResult");
             if (storedResult) {
-              const pendingResult = JSON.parse(storedResult);
-              await saveResult(data.user.id);
+              const parsed = JSON.parse(storedResult);
+              await saveResult(data.user.id, parsed);
               return;
             }
           }
@@ -129,14 +129,20 @@ export default function ResultLoginPage() {
     }
   };
 
-  const saveResult = async (userId: string) => {
+  const saveResult = async (userId: string, pending?: any) => {
+    const payload = pending ?? pendingResult;
+    if (!payload) {
+      setError("No pending result found to save.");
+      return;
+    }
+
     try {
       const response = await fetch("/api/results/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId,
-          ...pendingResult,
+          ...payload,
         }),
       });
 
@@ -145,9 +151,11 @@ export default function ResultLoginPage() {
         localStorage.removeItem("pendingTestResult");
         router.push(`/result/view/${data.resultId}`);
       } else {
-        setError("Failed to save result. Please try again.");
+        const errData = await response.json().catch(() => null);
+        setError(errData?.error || "Failed to save result. Please try again.");
       }
     } catch (err) {
+      console.error("saveResult error:", err);
       setError("An error occurred while saving your result.");
     }
   };

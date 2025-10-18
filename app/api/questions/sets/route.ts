@@ -3,10 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(_request: NextRequest) {
     try {
-        // Return active question sets (most recent first)
+        // Return active question sets (most recent first) and include question subjects
         const sets = await prisma.questionSet.findMany({
             where: { isActive: true },
-            include: { _count: { select: { questions: true } } },
+            include: {
+                _count: { select: { questions: true } },
+                questions: { include: { subject: { select: { name: true } } } },
+            },
             orderBy: { createdAt: "desc" },
         });
 

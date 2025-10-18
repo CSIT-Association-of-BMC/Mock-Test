@@ -73,7 +73,20 @@ export default async function ResultViewPage({ params }: PageProps) {
   }
 
   const percentage = Math.round((result.score / result.totalQuestions) * 100);
-  const attemptData = JSON.parse(result.attemptDetails);
+  const attemptData = JSON.parse(result.attemptDetails || "{}");
+
+  // Calculate attempted counts from stored attempt details
+  let attemptedCount = 0;
+  if (attemptData && Array.isArray(attemptData.answers)) {
+    attemptedCount = attemptData.answers.filter(
+      (a: any) => a.selectedAnswer !== null && a.selectedAnswer !== undefined
+    ).length;
+  }
+  // Wrong answers should be counted only from attempted answers
+  const wrongFromAttempted = Math.max(0, attemptedCount - result.score);
+  const attemptedPercent = result.totalQuestions
+    ? Math.round((attemptedCount / result.totalQuestions) * 100)
+    : 0;
 
   // Calculate subject-wise breakdown for full mock tests
   const subjectBreakdown: {
@@ -161,11 +174,14 @@ export default async function ResultViewPage({ params }: PageProps) {
                     Questions Attempted
                   </span>
                   <span className="text-sm font-semibold">
-                    {result.totalQuestions}/{result.totalQuestions}
+                    {attemptedCount}/{result.totalQuestions}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-primary h-2 rounded-full w-full"></div>
+                  <div
+                    className="bg-primary h-2 rounded-full transition-all"
+                    style={{ width: `${attemptedPercent}%` }}
+                  ></div>
                 </div>
               </div>
             </div>
@@ -185,7 +201,7 @@ export default async function ResultViewPage({ params }: PageProps) {
               <div className="flex justify-between">
                 <span className="text-gray-600">Wrong Answers</span>
                 <span className="font-semibold text-gray-900">
-                  {result.totalQuestions - result.score}
+                  {wrongFromAttempted}
                 </span>
               </div>
               <div className="flex justify-between">

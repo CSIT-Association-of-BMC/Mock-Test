@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Poppins } from "next/font/google";
 import ClientProviders from "@/components/client-providers";
 import Navbar from "@/components/custom/Navbar";
 import NextTopLoader from "nextjs-toploader";
 import Footer from "@/components/custom/Footer";
 import PWAInstallPrompt from "@/components/pwa-install-prompt";
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  style: "normal",
-  display: "swap",
-});
+// We avoid using next/font to prevent build-time Google Fonts download issues in some environments.
+// Use a runtime <link> tag to load Poppins from Google Fonts instead.
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mock.csitabmc.com"),
@@ -91,8 +86,13 @@ export default function RootLayout({
           href="https://res.cloudinary.com/dol8m5gx7/image/upload/v1723191383/logohero_nsqj8h.png"
         />
         <link rel="manifest" href="/manifest.json" />
+        {/* Load Poppins at runtime to avoid build-time download errors from next/font */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        />
       </head>
-      <body className={`${poppins.className} antialiased`}>
+      <body className={`antialiased`}>
         <NextTopLoader showSpinner={false} color="red" />
         <Navbar />
         <ClientProviders>{children}</ClientProviders>

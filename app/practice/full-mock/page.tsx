@@ -4,6 +4,14 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Clock, AlertTriangle, CheckCircle } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 type Question = {
   id: string;
@@ -159,14 +167,21 @@ export default function FullMockTestPage() {
     }
   };
 
+  // Custom start dialog state (replaces window.confirm)
+  const [startDialogOpen, setStartDialogOpen] = useState(false);
+  const [startDialogTitle, setStartDialogTitle] = useState(
+    "Start Full Mock Test"
+  );
+  const [startDialogMessage, setStartDialogMessage] = useState(
+    "Once you start, the 2-hour timer will begin. Tab switching is restricted. Are you ready?"
+  );
+
   const handleStartTest = () => {
-    if (
-      confirm(
-        "Once you start, the 2-hour timer will begin. Tab switching is restricted. Are you ready?"
-      )
-    ) {
-      setTestStarted(true);
-    }
+    setStartDialogTitle("Start Full Mock Test");
+    setStartDialogMessage(
+      "Once you start, the 2-hour timer will begin. Tab switching is restricted. Are you ready?"
+    );
+    setStartDialogOpen(true);
   };
 
   if (loading) {
@@ -258,6 +273,33 @@ export default function FullMockTestPage() {
               Go Back
             </Button>
           </div>
+
+          {/* Start confirmation dialog (replaces native confirm) */}
+          <Dialog open={startDialogOpen} onOpenChange={setStartDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{startDialogTitle}</DialogTitle>
+                <DialogDescription>{startDialogMessage}</DialogDescription>
+              </DialogHeader>
+
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setStartDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    setStartDialogOpen(false);
+                    setTestStarted(true);
+                  }}
+                >
+                  Start Test
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     );
