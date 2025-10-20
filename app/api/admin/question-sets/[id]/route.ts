@@ -92,3 +92,47 @@ export async function POST(
         );
     }
 }
+
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const session = await getAdminSession();
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const { id } = await params;
+
+        // Check if question set exists
+        const questionSet = await prisma.questionSet.findUnique({
+            where: { id },
+            include: {
+                _count: {
+                    select: { questions: true },
+                },
+            },
+        });
+
+        if (!questionSet) {
+            return NextResponse.json(
+                { error: "Question set not found" },
+                { status: 404 }
+            );
+        }
+
+        // Delete the question set (this will cascade delete related questions due to Prisma schema)
+        await prisma.questionSet.delete({
+            where: { id },
+        });
+
+        return NextResponse.json({ message: "Question set deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting question set:", error);
+        return NextResponse.json(
+            { error: "Internal server error" },
+            { status: 500 }
+        );
+    }
+}

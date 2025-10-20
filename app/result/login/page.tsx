@@ -81,6 +81,8 @@ export default function ResultLoginPage() {
 
       if (response.ok) {
         const data = await response.json();
+        // Dispatch custom event to update navbar
+        window.dispatchEvent(new CustomEvent("authChange"));
         await saveResult(data.user.id);
       } else {
         setError("Invalid email or password");
@@ -117,6 +119,8 @@ export default function ResultLoginPage() {
 
       if (response.ok) {
         const data = await response.json();
+        // Dispatch custom event to update navbar
+        window.dispatchEvent(new CustomEvent("authChange"));
         await saveResult(data.user.id);
       } else {
         const errorData = await response.json();

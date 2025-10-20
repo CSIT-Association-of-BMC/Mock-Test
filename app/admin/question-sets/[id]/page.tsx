@@ -11,6 +11,8 @@ import {
   Trash2,
   CheckCircle,
   AlertTriangle,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 
 type Question = {
@@ -38,6 +40,7 @@ type QuestionSet = {
 export default function QuestionSetDetailsPage() {
   const [questionSet, setQuestionSet] = useState<QuestionSet | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const router = useRouter();
   const params = useParams();
   const questionSetId = params.id as string;
@@ -92,6 +95,155 @@ export default function QuestionSetDetailsPage() {
       alert("Failed to unlink question");
     }
   };
+
+  const handleDeleteQuestion = async (questionId: string) => {
+    if (
+      !confirm(
+        "⚠️ WARNING: This will permanently delete this question from the database. This action cannot be undone!"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/admin/question-sets/${questionSetId}/delete-questions`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            questionIds: [questionId],
+          }),
+        }
+      );
+
+      if (response.ok) {
+        fetchQuestionSet(); // Refresh data
+      } else {
+        const error = await response.json();
+        alert(error.error || "Failed to delete question");
+      }
+    } catch (error) {
+      console.error("Error deleting question:", error);
+      alert("Failed to delete question");
+    }
+  };
+
+  const handleBulkUnlinkQuestions = async () => {
+    if (selectedQuestions.length === 0) {
+      alert("Please select questions to unlink.");
+      return;
+    }
+
+    if (
+      !confirm(
+        `Are you sure you want to unlink ${selectedQuestions.length} question${
+          selectedQuestions.length !== 1 ? "s" : ""
+        } from the set? Questions will remain in the database.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/admin/question-sets/${questionSetId}/unlink-questions`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            questionIds: selectedQuestions,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        setSelectedQuestions([]); // Clear selection
+        fetchQuestionSet(); // Refresh data
+      } else {
+        const error = await response.json();
+        alert(error.error || "Failed to unlink questions");
+      }
+    } catch (error) {
+      console.error("Error unlinking questions:", error);
+      alert("Failed to unlink questions");
+    }
+  };
+
+  const handleBulkDeleteQuestions = async () => {
+    if (selectedQuestions.length === 0) {
+      alert("Please select questions to delete.");
+      return;
+    }
+
+    if (
+      !confirm(
+        `⚠️ WARNING: This will permanently delete ${
+          selectedQuestions.length
+        } question${
+          selectedQuestions.length !== 1 ? "s" : ""
+        } from the database. This action cannot be undone!`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/admin/question-sets/${questionSetId}/delete-questions`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            questionIds: selectedQuestions,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        setSelectedQuestions([]); // Clear selection
+        fetchQuestionSet(); // Refresh data
+      } else {
+        const error = await response.json();
+        alert(error.error || "Failed to delete questions");
+      }
+    } catch (error) {
+      console.error("Error deleting questions:", error);
+      alert("Failed to delete questions");
+    }
+  };
+
+  const handleSelectQuestion = (questionId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedQuestions((prev) => [...prev, questionId]);
+    } else {
+      setSelectedQuestions((prev) => prev.filter((id) => id !== questionId));
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked && questionSet) {
+      setSelectedQuestions(questionSet.questions.map((q) => q.id));
+    } else {
+      setSelectedQuestions([]);
+    }
+  };
+
+  const isAllSelected = questionSet
+    ? selectedQuestions.length === questionSet.questions.length &&
+      questionSet.questions.length > 0
+    : false;
+
+  const isIndeterminate =
+    selectedQuestions.length > 0 &&
+    questionSet &&
+    selectedQuestions.length < questionSet.questions.length;
 
   const toggleActiveStatus = async () => {
     if (!questionSet) return;
@@ -304,16 +456,64 @@ export default function QuestionSetDetailsPage() {
         {/* Questions List */}
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-8 py-6 border-b border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Linked Questions
-            </h2>
-            <p className="text-gray-600 mt-1">
-              {questionSet.questions.length === 0
-                ? "No questions linked yet. Link questions to make this set available for tests."
-                : `${questionSet.questions.length} question${
-                    questionSet.questions.length !== 1 ? "s" : ""
-                  } linked to this set.`}
-            </p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Linked Questions
+                </h2>
+                <p className="text-gray-600 mt-1">
+                  {questionSet.questions.length === 0
+                    ? "No questions linked yet. Link questions to make this set available for tests."
+                    : `${questionSet.questions.length} question${
+                        questionSet.questions.length !== 1 ? "s" : ""
+                      } linked to this set.`}
+                </p>
+              </div>
+              {questionSet.questions.length > 0 && (
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleSelectAll(!isAllSelected)}
+                      className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                    >
+                      {isAllSelected ? (
+                        <CheckSquare className="w-4 h-4" />
+                      ) : (
+                        <Square className="w-4 h-4" />
+                      )}
+                      Select All
+                    </button>
+                    {selectedQuestions.length > 0 && (
+                      <span className="text-sm text-gray-500">
+                        {selectedQuestions.length} selected
+                      </span>
+                    )}
+                  </div>
+                  {selectedQuestions.length > 0 && (
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={handleBulkUnlinkQuestions}
+                        variant="outline"
+                        size="sm"
+                        className="border-orange-300 text-orange-600 hover:bg-orange-50"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Unlink Selected ({selectedQuestions.length})
+                      </Button>
+                      <Button
+                        onClick={handleBulkDeleteQuestions}
+                        variant="outline"
+                        size="sm"
+                        className="border-red-300 text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete Selected ({selectedQuestions.length})
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="p-8">
@@ -347,6 +547,17 @@ export default function QuestionSetDetailsPage() {
                     <CardHeader className="pb-4">
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedQuestions.includes(question.id)}
+                            onChange={(e) =>
+                              handleSelectQuestion(
+                                question.id,
+                                e.target.checked
+                              )
+                            }
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
                           <CardTitle className="text-lg">
                             Question {index + 1}
                           </CardTitle>
@@ -354,14 +565,26 @@ export default function QuestionSetDetailsPage() {
                             {question.subject.name}
                           </span>
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleUnlinkQuestion(question.id)}
-                          className="border-red-300 text-red-600 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleUnlinkQuestion(question.id)}
+                            className="border-orange-300 text-orange-600 hover:bg-orange-50"
+                            title="Unlink from set (keeps question in database)"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteQuestion(question.id)}
+                            className="border-red-300 text-red-600 hover:bg-red-50"
+                            title="Permanently delete from database"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent>

@@ -11,6 +11,7 @@ import {
   Users,
   FileText,
   Settings,
+  Trash2,
 } from "lucide-react";
 
 type QuestionSet = {
@@ -43,6 +44,33 @@ export default function AdminDashboard() {
       console.error("Error fetching question sets:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteSet = async (setId: string, setName: string) => {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${setName}"? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/question-sets/${setId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Refresh the question sets list
+        fetchQuestionSets();
+      } else {
+        const error = await response.json();
+        alert(`Error deleting question set: ${error.error}`);
+      }
+    } catch (error) {
+      console.error("Error deleting question set:", error);
+      alert("Error deleting question set. Please try again.");
     }
   };
 
@@ -239,6 +267,14 @@ export default function AdminDashboard() {
                       className="flex-1 bg-blue-600 hover:bg-blue-700"
                     >
                       Add Questions
+                    </Button>
+                    <Button
+                      onClick={() => handleDeleteSet(set.id, set.setName)}
+                      variant="outline"
+                      size="sm"
+                      className="px-3 border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
