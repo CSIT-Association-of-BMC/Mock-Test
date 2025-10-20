@@ -93,6 +93,42 @@ export async function POST(
     }
 }
 
+export async function PATCH(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const session = await getAdminSession();
+        if (!session) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const { id } = await params;
+        const { isActive } = await request.json();
+
+        if (typeof isActive !== "boolean") {
+            return NextResponse.json(
+                { error: "isActive must be a boolean" },
+                { status: 400 }
+            );
+        }
+
+        // Update the question set
+        const updatedQuestionSet = await prisma.questionSet.update({
+            where: { id },
+            data: { isActive },
+        });
+
+        return NextResponse.json(updatedQuestionSet);
+    } catch (error) {
+        console.error("Error updating question set:", error);
+        return NextResponse.json(
+            { error: "Internal server error" },
+            { status: 500 }
+        );
+    }
+}
+
 export async function DELETE(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
