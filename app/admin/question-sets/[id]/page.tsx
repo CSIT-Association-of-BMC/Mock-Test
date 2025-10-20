@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import {
   ArrowLeft,
   BookOpen,
@@ -41,6 +42,16 @@ export default function QuestionSetDetailsPage() {
   const [questionSet, setQuestionSet] = useState<QuestionSet | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [unlinkDialog, setUnlinkDialog] = useState<{
+    open: boolean;
+    questionId: string;
+    isBulk: boolean;
+  }>({ open: false, questionId: "", isBulk: false });
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    questionId: string;
+    isBulk: boolean;
+  }>({ open: false, questionId: "", isBulk: false });
   const router = useRouter();
   const params = useParams();
   const questionSetId = params.id as string;
@@ -64,12 +75,10 @@ export default function QuestionSetDetailsPage() {
   }, [fetchQuestionSet]);
 
   const handleUnlinkQuestion = async (questionId: string) => {
-    if (
-      !confirm("Are you sure you want to unlink this question from the set?")
-    ) {
-      return;
-    }
+    setUnlinkDialog({ open: true, questionId, isBulk: false });
+  };
 
+  const confirmUnlinkQuestion = async () => {
     try {
       const response = await fetch(
         `/api/admin/question-sets/${questionSetId}/unlink-questions`,
@@ -79,32 +88,30 @@ export default function QuestionSetDetailsPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            questionIds: [questionId],
+            questionIds: unlinkDialog.isBulk
+              ? selectedQuestions
+              : [unlinkDialog.questionId],
           }),
         }
       );
 
       if (response.ok) {
+        setSelectedQuestions([]); // Clear selection for bulk operations
         fetchQuestionSet(); // Refresh data
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to unlink question");
+        console.error(error.error || "Failed to unlink question(s)");
       }
     } catch (error) {
-      console.error("Error unlinking question:", error);
-      alert("Failed to unlink question");
+      console.error("Error unlinking question(s):", error);
     }
   };
 
   const handleDeleteQuestion = async (questionId: string) => {
-    if (
-      !confirm(
-        "⚠️ WARNING: This will permanently delete this question from the database. This action cannot be undone!"
-      )
-    ) {
-      return;
-    }
+    setDeleteDialog({ open: true, questionId, isBulk: false });
+  };
 
+  const confirmDeleteQuestion = async () => {
     try {
       const response = await fetch(
         `/api/admin/question-sets/${questionSetId}/delete-questions`,
@@ -114,109 +121,37 @@ export default function QuestionSetDetailsPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            questionIds: [questionId],
+            questionIds: deleteDialog.isBulk
+              ? selectedQuestions
+              : [deleteDialog.questionId],
           }),
         }
       );
 
       if (response.ok) {
+        setSelectedQuestions([]); // Clear selection for bulk operations
         fetchQuestionSet(); // Refresh data
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to delete question");
+        console.error(error.error || "Failed to delete question(s)");
       }
     } catch (error) {
-      console.error("Error deleting question:", error);
-      alert("Failed to delete question");
+      console.error("Error deleting question(s):", error);
     }
   };
 
   const handleBulkUnlinkQuestions = async () => {
     if (selectedQuestions.length === 0) {
-      alert("Please select questions to unlink.");
       return;
     }
-
-    if (
-      !confirm(
-        `Are you sure you want to unlink ${selectedQuestions.length} question${
-          selectedQuestions.length !== 1 ? "s" : ""
-        } from the set? Questions will remain in the database.`
-      )
-    ) {
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `/api/admin/question-sets/${questionSetId}/unlink-questions`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            questionIds: selectedQuestions,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        setSelectedQuestions([]); // Clear selection
-        fetchQuestionSet(); // Refresh data
-      } else {
-        const error = await response.json();
-        alert(error.error || "Failed to unlink questions");
-      }
-    } catch (error) {
-      console.error("Error unlinking questions:", error);
-      alert("Failed to unlink questions");
-    }
+    setUnlinkDialog({ open: true, questionId: "", isBulk: true });
   };
 
   const handleBulkDeleteQuestions = async () => {
     if (selectedQuestions.length === 0) {
-      alert("Please select questions to delete.");
       return;
     }
-
-    if (
-      !confirm(
-        `⚠️ WARNING: This will permanently delete ${
-          selectedQuestions.length
-        } question${
-          selectedQuestions.length !== 1 ? "s" : ""
-        } from the database. This action cannot be undone!`
-      )
-    ) {
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `/api/admin/question-sets/${questionSetId}/delete-questions`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            questionIds: selectedQuestions,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        setSelectedQuestions([]); // Clear selection
-        fetchQuestionSet(); // Refresh data
-      } else {
-        const error = await response.json();
-        alert(error.error || "Failed to delete questions");
-      }
-    } catch (error) {
-      console.error("Error deleting questions:", error);
-      alert("Failed to delete questions");
-    }
+    setDeleteDialog({ open: true, questionId: "", isBulk: true });
   };
 
   const handleSelectQuestion = (questionId: string, checked: boolean) => {
@@ -621,6 +556,42 @@ export default function QuestionSetDetailsPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmationDialog
+        open={unlinkDialog.open}
+        onOpenChange={(open) => setUnlinkDialog({ ...unlinkDialog, open })}
+        title={unlinkDialog.isBulk ? "Unlink Questions" : "Unlink Question"}
+        description={
+          unlinkDialog.isBulk
+            ? `Are you sure you want to unlink ${
+                selectedQuestions.length
+              } question${
+                selectedQuestions.length !== 1 ? "s" : ""
+              } from the set? Questions will remain in the database and can be linked to other sets.`
+            : "Are you sure you want to unlink this question from the set? The question will remain in the database and can be linked to other sets."
+        }
+        confirmText="Unlink"
+        onConfirm={confirmUnlinkQuestion}
+        variant="default"
+      />
+
+      <ConfirmationDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}
+        title={deleteDialog.isBulk ? "Delete Questions" : "Delete Question"}
+        description={
+          deleteDialog.isBulk
+            ? `⚠️ WARNING: This will permanently delete ${
+                selectedQuestions.length
+              } question${
+                selectedQuestions.length !== 1 ? "s" : ""
+              } from the database. This action cannot be undone!`
+            : "⚠️ WARNING: This will permanently delete this question from the database. This action cannot be undone!"
+        }
+        confirmText="Delete"
+        onConfirm={confirmDeleteQuestion}
+        variant="destructive"
+      />
     </div>
   );
 }
