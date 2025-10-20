@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import {
   PlusCircle,
   BookOpen,
@@ -27,6 +28,11 @@ type QuestionSet = {
 export default function AdminDashboard() {
   const [questionSets, setQuestionSets] = useState<QuestionSet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    setId: string;
+    setName: string;
+  }>({ open: false, setId: "", setName: "" });
   const router = useRouter();
 
   useEffect(() => {
@@ -48,29 +54,28 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteSet = async (setId: string, setName: string) => {
-    if (
-      !confirm(
-        `Are you sure you want to delete "${setName}"? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
+    setDeleteDialog({ open: true, setId, setName });
+  };
 
+  const confirmDeleteSet = async () => {
     try {
-      const response = await fetch(`/api/admin/question-sets/${setId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/admin/question-sets/${deleteDialog.setId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         // Refresh the question sets list
         fetchQuestionSets();
       } else {
         const error = await response.json();
-        alert(`Error deleting question set: ${error.error}`);
+        // For now, we'll use console.error since we can't show alerts in dialogs
+        console.error(`Error deleting question set: ${error.error}`);
       }
     } catch (error) {
       console.error("Error deleting question set:", error);
-      alert("Error deleting question set. Please try again.");
     }
   };
 
@@ -283,6 +288,16 @@ export default function AdminDashboard() {
           )}
         </div>
       </div>
+
+      <ConfirmationDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}
+        title="Delete Question Set"
+        description={`Are you sure you want to delete "${deleteDialog.setName}"? This action cannot be undone and will permanently remove the question set from the database.`}
+        confirmText="Delete"
+        onConfirm={confirmDeleteSet}
+        variant="destructive"
+      />
     </div>
   );
 }
