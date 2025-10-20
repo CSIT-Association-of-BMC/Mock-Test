@@ -28,6 +28,8 @@ export default function AdminLoginPage() {
       });
 
       if (response.ok) {
+        // Dispatch custom event to update navbar
+        window.dispatchEvent(new CustomEvent("authChange"));
         router.push("/admin");
         router.refresh();
       } else {

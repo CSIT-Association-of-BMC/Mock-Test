@@ -33,7 +33,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const NavLinks = [
   {
@@ -78,6 +78,7 @@ const Navbar = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleResize = () => {
@@ -110,6 +111,7 @@ const Navbar = () => {
     };
 
     const handleAuthChange = () => {
+      // Don't set loading to true for auth changes, just re-check auth
       checkAuth();
     };
 
@@ -121,7 +123,7 @@ const Navbar = () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("authChange", handleAuthChange);
     };
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
     try {
@@ -207,41 +209,41 @@ const Navbar = () => {
           </NavigationMenu>
 
           <div className="hidden sm:flex items-center space-x-4">
-            {!loading &&
-              (user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="flex items-center gap-2 font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="flex items-center gap-2 font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                  >
+                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-primary" />
+                    </div>
+                    <span className="hidden md:block">{user.name}</span>
+                    <ChevronDown className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 mt-2 shadow-lg border-gray-200">
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href={user.isAdmin ? "/admin" : "/dashboard"}
+                      className="flex items-center w-full px-3 py-2 text-left font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-primary" />
-                      </div>
-                      <span className="hidden md:block">{user.name}</span>
-                      <ChevronDown className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 mt-2 shadow-lg border-gray-200">
-                    <DropdownMenuItem asChild>
-                      <Link
-                        href="/dashboard"
-                        className="flex items-center w-full px-3 py-2 text-left font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors duration-200"
-                      >
-                        <User className="w-4 h-4 mr-2" />
-                        Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={handleLogout}
-                      className="flex items-center w-full px-3 py-2 text-left font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
-                    >
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
+                      <User className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-3 py-2 text-left font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              !loading && (
                 <Link href="/login">
                   <Button
                     variant="outline"
@@ -250,7 +252,8 @@ const Navbar = () => {
                     Login
                   </Button>
                 </Link>
-              ))}
+              )
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -356,37 +359,40 @@ function MobileView({
         </nav>
 
         <div className="pt-6 mt-6 border-t border-gray-200">
-          {!loading &&
-            (user ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-primary" />
-                  </div>
-                  <span className="font-medium text-gray-900">{user.name}</span>
+          {user ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-primary" />
                 </div>
-                <Link href="/dashboard" onClick={handleLinkClick}>
-                  <Button
-                    variant="outline"
-                    className="w-full font-medium border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
-                  >
-                    <User className="w-4 h-4 mr-2" />
-                    Dashboard
-                  </Button>
-                </Link>
+                <span className="font-medium text-gray-900">{user.name}</span>
+              </div>
+              <Link
+                href={user.isAdmin ? "/admin" : "/dashboard"}
+                onClick={handleLinkClick}
+              >
                 <Button
-                  onClick={() => {
-                    handleLogout();
-                    handleLinkClick();
-                  }}
                   variant="outline"
                   className="w-full font-medium border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
                 >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
+                  <User className="w-4 h-4 mr-2" />
+                  Dashboard
                 </Button>
-              </div>
-            ) : (
+              </Link>
+              <Button
+                onClick={() => {
+                  handleLogout();
+                  handleLinkClick();
+                }}
+                variant="outline"
+                className="w-full font-medium border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          ) : (
+            !loading && (
               <Link href="/login" onClick={handleLinkClick}>
                 <Button
                   variant="outline"
@@ -395,7 +401,8 @@ function MobileView({
                   Login
                 </Button>
               </Link>
-            ))}
+            )
+          )}
         </div>
       </div>
     </SheetContent>

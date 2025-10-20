@@ -8,7 +8,7 @@ const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || "your-sec
 
 export async function POST(request: NextRequest) {
     try {
-        const { email, password, name, priorityCollege, howHeard } = await request.json();
+        const { email, password, name, priorityCollege, howHeard, howHeardOther } = await request.json();
 
         if (!email || !password || !name) {
             return NextResponse.json(
@@ -32,6 +32,9 @@ export async function POST(request: NextRequest) {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Determine the final howHeard value
+        const finalHowHeard = howHeard === "other" ? howHeardOther : howHeard;
+
         // Create user
         const user = await prisma.user.create({
             data: {
@@ -39,7 +42,7 @@ export async function POST(request: NextRequest) {
                 name,
                 password: hashedPassword,
                 priorityCollege: priorityCollege || null,
-                howHeard: howHeard || null,
+                howHeard: finalHowHeard || null,
             },
         });
 

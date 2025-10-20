@@ -92,7 +92,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         />
       </head>
-      <body className={`antialiased`}>
+      <body className={`antialiased`} suppressHydrationWarning={true}>
         <NextTopLoader showSpinner={false} color="red" />
         <Navbar />
         <ClientProviders>{children}</ClientProviders>
