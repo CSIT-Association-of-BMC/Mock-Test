@@ -10,14 +10,14 @@ const Footer = () => {
         </a>
         . All rights reserved.
       </span>
-      {/* <br />
+       <br />
       <span>
         Powered by{" "}
         <a className="text-blue-400" href="https://consolesoft.ltd">
           {" "}
           Console.soft
         </a>
-      </span> */}
+      </span> 
     </footer>
   );
 };
