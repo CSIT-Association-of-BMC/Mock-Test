@@ -187,13 +187,6 @@ export default function AddQuestionsPage() {
           </Button>
           <div className="flex gap-2">
             <Button
-              onClick={handleBulkImport}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              Import CSV
-            </Button>
-            <Button
               onClick={handleSubmit}
               disabled={loading}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
