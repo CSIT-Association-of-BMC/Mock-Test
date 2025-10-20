@@ -3,8 +3,11 @@ import { cookies } from "next/headers";
 
 export async function POST(_request: NextRequest) {
     try {
-        // Clear the user token cookie
-        (await cookies()).delete("user-token");
+        const cookieStore = await cookies();
+
+        // Clear both user and admin token cookies
+        cookieStore.delete("user-token");
+        cookieStore.delete("admin-token");
 
         return NextResponse.json({ success: true });
     } catch (error) {

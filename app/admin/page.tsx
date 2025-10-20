@@ -81,8 +81,13 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     await fetch("/api/auth/signout", { method: "POST" });
-    router.push("/admin/login");
-    router.refresh();
+    // Dispatch custom event to update navbar
+    window.dispatchEvent(new CustomEvent("authChange"));
+    // Small delay to ensure event is processed
+    setTimeout(() => {
+      router.push("/admin/login");
+      router.refresh();
+    }, 100);
   };
 
   const totalQuestions = questionSets.reduce(
