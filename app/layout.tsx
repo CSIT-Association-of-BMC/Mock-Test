@@ -5,9 +5,9 @@ import Navbar from "@/components/custom/Navbar";
 import NextTopLoader from "nextjs-toploader";
 import Footer from "@/components/custom/Footer";
 import PWAInstallPrompt from "@/components/pwa-install-prompt";
-
-// We avoid using next/font to prevent build-time Google Fonts download issues in some environments.
-// Use a runtime <link> tag to load Poppins from Google Fonts instead.
+import Clarity from "@microsoft/clarity";
+import GoogleAnalytics from "@/components/custom/GoogleAnalytics";
+import MicrosoftClarity from "@/components/custom/MicrosoftClarity";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mock.csitabmc.com"),
@@ -51,6 +51,9 @@ export const metadata: Metadata = {
     "engineering entrance",
     "college entrance exam",
   ],
+  authors: [
+    { name: "CSIT Association of BMC", url: "https://www.csitabmc.com/" },
+  ],
   openGraph: {
     images: {
       url: "https://res.cloudinary.com/dol8m5gx7/image/upload/v1723191383/logohero_nsqj8h.png",
@@ -66,6 +69,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const clarityProjectId = process.env.CLARITY_PROJECT_ID as string;
+  Clarity.init(clarityProjectId);
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -91,6 +96,13 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         />
+        <GoogleAnalytics />
+        <MicrosoftClarity />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4150130021078265"
+          crossOrigin="anonymous"
+        ></script>
       </head>
       <body className={`antialiased`} suppressHydrationWarning={true}>
         <NextTopLoader showSpinner={false} color="red" />
