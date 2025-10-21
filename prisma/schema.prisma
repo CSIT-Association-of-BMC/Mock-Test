@@ -95,3 +95,15 @@ model UserResult {
   @@index([subjectId])
   @@map("user_results")
 }
+
+model Feedback {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("feedbacks")
+}

@@ -5,9 +5,11 @@ import Navbar from "@/components/custom/Navbar";
 import NextTopLoader from "nextjs-toploader";
 import Footer from "@/components/custom/Footer";
 import PWAInstallPrompt from "@/components/pwa-install-prompt";
+import FeedbackWidget from "@/components/feedback-widget";
 import Clarity from "@microsoft/clarity";
 import GoogleAnalytics from "@/components/custom/GoogleAnalytics";
 import MicrosoftClarity from "@/components/custom/MicrosoftClarity";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mock.csitabmc.com"),
@@ -110,6 +112,8 @@ export default function RootLayout({
         <ClientProviders>{children}</ClientProviders>
         <Footer />
         <PWAInstallPrompt />
+        <FeedbackWidget />
+        <Toaster />
       </body>
     </html>
   );
