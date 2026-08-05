@@ -9,6 +9,11 @@ import {
   Target,
   ArrowRight,
   AlertTriangle,
+  Atom,
+  FlaskConical,
+  Calculator,
+  Languages,
+  Cpu,
 } from "lucide-react";
 import {
   Dialog,
@@ -99,175 +104,143 @@ export default function PracticePage() {
     return list;
   }, [sets, query, sort]);
 
+  const subjects = [
+    { name: "Physics", path: "physics", icon: Atom },
+    { name: "Chemistry", path: "chemistry", icon: FlaskConical },
+    { name: "Mathematics", path: "mathematics", icon: Calculator },
+    { name: "English", path: "english", icon: Languages },
+    { name: "Computer Science", path: "computer-science", icon: Cpu },
+  ];
+
+  const breakdown = [
+    { name: "Physics", count: 25 },
+    { name: "Chemistry", count: 25 },
+    { name: "Mathematics", count: 25 },
+    { name: "English", count: 15 },
+    { name: "Computer", count: 10 },
+  ];
+
   return (
-    <div className="min-h-screen bg-white py-12 px-4">
+    <div className="min-h-screen bg-white py-16 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <Target className="w-4 h-4" />
+        <div className="max-w-2xl mb-14">
+          <p className="text-sm font-semibold text-primary tracking-widest uppercase mb-4">
             Practice Modes
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Choose Your Practice Mode
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+            Choose your practice mode
           </h1>
-          <p className="text-md sm:text-xl text-gray-600 max-w-3xl mx-auto">
-            Select from full mock tests or subject-wise practice to build your
-            confidence and track your progress in the B.Sc. CSIT entrance exam.
+          <p className="text-gray-600 leading-relaxed">
+            Select from a full mock test or subject-wise practice to build
+            your confidence and track your progress for the B.Sc. CSIT
+            entrance exam.
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2 lg:gap-8 mb-16">
-          {/* Full Mock Test Card (responsive) */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 hover:shadow-xl hover:border-primary/30 transition-all duration-200">
-            <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-2xl">
-                <Target className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+        <div className="grid gap-6 lg:grid-cols-2 mb-16">
+          {/* Full Mock Test Card */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 hover:border-gray-300 transition-colors duration-200">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-xl flex-shrink-0">
+                <Target className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                   Full Mock Test
                 </h2>
-                <p className="text-sm sm:text-base text-gray-600">
+                <p className="text-sm text-gray-500">
                   Complete exam simulation
                 </p>
               </div>
             </div>
 
-            <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-              <div className="flex items-center gap-2 sm:gap-3 text-gray-700">
-                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                <span className="font-medium text-sm sm:text-base">
-                  2 Hours (120 minutes)
-                </span>
+            <div className="flex items-center gap-6 mb-6 text-sm text-gray-700">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                <span className="font-medium">120 minutes</span>
               </div>
-              <div className="flex items-center gap-2 sm:gap-3 text-gray-700">
-                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                <span className="font-medium text-sm sm:text-base">
-                  100 Questions Total
-                </span>
-              </div>
-
-              <div className="ml-6 sm:ml-8 space-y-2 text-xs sm:text-sm text-gray-600">
-                <div className="flex justify-between">
-                  <span>• Physics</span>
-                  <span className="font-medium">25 Questions</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>• Chemistry</span>
-                  <span className="font-medium">25 Questions</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>• Mathematics</span>
-                  <span className="font-medium">25 Questions</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>• English</span>
-                  <span className="font-medium">15 Questions</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>• Computer</span>
-                  <span className="font-medium">10 Questions</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-primary" />
+                <span className="font-medium">100 questions</span>
               </div>
             </div>
 
-            <div className="space-y-3 sm:space-y-4">
-              <div className="p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-sm">
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 mt-0.5" />
-                  <div className="text-sm sm:text-sm text-amber-800">
-                    <strong>Important:</strong> Tab switching is restricted
-                    during the test. The exam will auto submit if you switch
-                    tabs or windows.
-                  </div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-6 pb-6 border-b border-gray-100">
+              {breakdown.map((s) => (
+                <div
+                  key={s.name}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="text-gray-500">{s.name}</span>
+                  <span className="font-medium text-gray-900">
+                    {s.count}
+                  </span>
                 </div>
-              </div>
-
-              <Button
-                onClick={openSetsDialog}
-                className="w-full py-3 sm:py-4 rounded-sm shadow-lg text-sm sm:text-md hover:shadow-xl transition-all duration-200 cursor-pointer"
-              >
-                Start Full Mock Test
-                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-              </Button>
+              ))}
             </div>
+
+            <div className="flex items-start gap-2.5 mb-6 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+              <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+              <p>
+                <strong>Important:</strong> Tab switching is restricted during
+                the test — the exam auto-submits if you switch tabs or
+                windows.
+              </p>
+            </div>
+
+            <Button
+              onClick={openSetsDialog}
+              className="w-full py-3 h-auto rounded-sm text-sm sm:text-base cursor-pointer"
+            >
+              Start Full Mock Test
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
           </div>
 
           {/* Subject-Wise Practice Card */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 hover:shadow-xl hover:border-blue-200 transition-all duration-200">
-            <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <div className="flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-50 rounded-2xl">
-                <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 hover:border-gray-300 transition-colors duration-200">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-xl flex-shrink-0">
+                <BookOpen className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                   Subject Practice
                 </h2>
-                <p className="text-sm sm:text-base text-gray-600">
+                <p className="text-sm text-gray-500">
                   Focus on individual subjects
                 </p>
               </div>
             </div>
 
-            <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 leading-relaxed">
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
               Strengthen your weak areas by practicing specific subjects. Each
-              subject contains targeted questions to help you master individual
-              topics.
+              subject contains targeted questions to help you master
+              individual topics.
             </p>
 
-            <div className="space-y-3 mb-6">
-              {[
-                {
-                  name: "Physics",
-                  path: "physics",
-                  color:
-                    "bg-primary/10 hover:bg-primary/20 text-primary border-primary/30 cursor-pointer",
-                },
-                {
-                  name: "Chemistry",
-                  path: "chemistry",
-                  color:
-                    "bg-green-50 hover:bg-green-100 text-green-700 border-green-200 cursor-pointer",
-                },
-                {
-                  name: "Mathematics",
-                  path: "mathematics",
-                  color:
-                    "bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200 cursor-pointer",
-                },
-                {
-                  name: "English",
-                  path: "english",
-                  color:
-                    "bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200 cursor-pointer",
-                },
-                {
-                  name: "Computer Science",
-                  path: "computer-science",
-                  color:
-                    "bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200 cursor-pointer",
-                },
-              ].map((subject) => (
-                <Button
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+              {subjects.map((subject) => (
+                <button
                   key={subject.path}
                   onClick={() =>
                     router.push(`/practice/subject/${subject.path}`)
                   }
-                  variant="outline"
-                  className={`w-full justify-between border-2 ${subject.color} hover:shadow-md transition-all duration-200 py-3 sm:py-4 rounded-sm text-sm sm:text-base`}
+                  className="group flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors duration-200 cursor-pointer"
                 >
-                  <span className="font-medium">{subject.name}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
+                  <subject.icon className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors flex-shrink-0" />
+                  <span className="flex-1 text-sm font-medium text-gray-800">
+                    {subject.name}
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                </button>
               ))}
             </div>
 
-            <div className="text-center">
-              <p className="text-xs sm:text-sm text-gray-500">
-                Unlimited practice • No time limit • Instant feedback
-              </p>
-            </div>
+            <p className="text-xs sm:text-sm text-gray-500 text-center">
+              Unlimited practice · No time limit · Instant feedback
+            </p>
           </div>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
