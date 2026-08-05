@@ -12,7 +12,7 @@ import {
   Lock,
   GraduationCap,
   Users,
-  Sparkles,
+  UserPlus,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -425,7 +425,7 @@ export default function LoginPage() {
                       : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
-                  <Sparkles className="w-4 h-4 inline mr-2" />
+                  <UserPlus className="w-4 h-4 inline mr-2" />
                   Register
                 </button>
               </div>

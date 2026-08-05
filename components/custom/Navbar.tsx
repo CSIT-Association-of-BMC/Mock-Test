@@ -63,7 +63,7 @@ const NavLinks = [
       },
       {
         title: "Computer",
-        href: "/practice/subject/computer",
+        href: "/practice/subject/computer-science",
       },
       {
         title: "English",
